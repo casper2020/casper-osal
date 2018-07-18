@@ -1,0 +1,350 @@
+/**
+ * @file json_parser_base.rlh
+ *
+ * Copyright (c) 2011-2018 Cloudware S.A. All rights reserved.
+ *
+ * This file is part of casper-osal.
+ *
+ * casper-osal is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * casper-osal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with osal.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunreachable-code"
+
+%%{
+    machine json_parser_base;
+    variable cs    cs_;
+    variable top   top_;
+    variable stack stack_;
+
+    ws = [ \t\r\n];
+
+    ################################################
+    # Number parser handles both integer and floats
+    ################################################
+
+    action sign
+    {
+        if ( fc == '-' ) {
+            negative_ = true;
+        }
+    }
+
+    action dgt
+    {
+        integer_ *= 10;
+        integer_ += (fc - '0');
+    }
+
+    action frac
+    {
+        if ( ( fractional_digits_cnt_ + 1 ) < k_max_fractional_digits_ ) {
+            fractional_ *= 10;
+            divider_    *= 10;
+            fractional_ += (fc - '0');
+            fractional_digits_cnt_++;
+        }
+    }
+
+    action exp
+    {
+        exponent_ *= 10;
+        exponent_ += (fc - '0');
+    }
+
+    action exp_sign
+    {
+        if ( fc == '-' ) {
+            negative_exponent_ = true;
+        }
+    }
+
+
+    action reset_number
+    {
+        negative_              = false;
+        integer_               = 0;
+        fractional_            = 0;
+        fractional_digits_cnt_ = 0;
+        divider_               = 1;
+        negative_exponent_     = false;
+        exponent_              = 0;
+    }
+
+    action parse_number
+    {
+        if ( divider_ == 1 && exponent_ == 0 ) {
+            int_value_ = negative_ ? -((int64_t) integer_) : integer_;
+            double_value_ = int_value_;
+        } else {
+            if ( negative_ == false ) {
+                double_value_ = integer_ + (double) fractional_ / (double) divider_;
+            } else {
+                double_value_ = -(integer_ + (double) fractional_ / (double) divider_);
+            }
+            if ( exponent_ != 0 ) {
+                if ( negative_exponent_ == false ) {
+                    double_value_ *= (double) Pow10((int)exponent_);
+                } else {
+                    double_value_ /= (double) Pow10((int)exponent_);
+                }
+            }
+        }
+    }
+
+    number = (zlen >reset_number ([+\-] $sign)? [0-9]+ $dgt ( '.' [0-9]+ $frac )?( [eE] ( [+\-] $exp_sign )? [0-9]+ $exp )? %parse_number);
+
+    ################################################
+    # Boolean parser
+    ################################################
+
+    action clear_boolean
+    {
+        boolean_value_ = false;
+    }
+
+    action save_boolean
+    {
+        boolean_value_ = true;
+    }
+
+    action print_bool
+    {
+        printf("bool %s\n", boolean_value_ ? "true" : "false");
+    }
+
+    boolean = ('true' @save_boolean | 'false' @clear_boolean | 'null' @clear_boolean);
+
+    ###################################################################
+    # Quoted string parser (contiguous memory non-incremental parsers)
+    ###################################################################
+
+    action mark_string_start
+    {
+        string_start_ = fpc + 1;
+        string_has_escapes_ = false;
+    }
+
+    action mark_string_end
+    {
+        string_length_ = fpc - string_start_;
+    }
+
+    qstring  = ('"' >mark_string_start
+                    (
+                       [^\\"]                                                  |
+                       ( '\\' ["\\\/bfnrt]  %{ string_has_escapes_ = true; } ) |
+                       ( '\\' 'u' xdigit{4} %{ string_has_escapes_ = true; } )
+                    )*
+                '"' @mark_string_end );
+
+    ####################################################################
+    # Quoted character sequence parser suitable for incremental parsers
+    ####################################################################
+
+    action copy_character
+    {
+        if ( write_pointer_ == write_limit_ ) {
+            error_col_ = int(fpc - a_json);
+            fbreak;
+        }
+        *(write_pointer_++) = fc;
+    }
+
+    action escape_character
+    {
+        if ( write_pointer_ == write_limit_ ) {
+            error_col_ = int(fpc - a_json);
+            fbreak;
+        }
+
+        switch ( fc ) {
+        case '"':
+        case '\\':
+        case '/':
+            *(write_pointer_++) = fc;
+            break;
+        case 'b':
+            *(write_pointer_++) = '\b';
+            break;
+        case 'f':
+            *(write_pointer_++) = '\f';
+            break;
+        case 'n':
+            *(write_pointer_++) = '\n';
+            break;
+        case 'r':
+            *(write_pointer_++) = '\r';
+            break;
+        case 't':
+            *(write_pointer_++) = '\t';
+            break;
+        default:
+            *(write_pointer_++) = fc;
+            break;
+        }
+
+    }
+
+    action unicode_start
+    {
+        code_point_ = 0;
+        code_point_shift_ = 12;
+    }
+
+    action unicode_decode
+    {
+        code_point_ |=  (kHexTable[(int) fc] << code_point_shift_);
+        code_point_shift_ -= 4;
+    }
+
+    action unicode_end
+    {
+        if (code_point_ <= 0x7F) {
+            if ( write_pointer_ == write_limit_ ) {
+                error_col_ = int(fpc - a_json);
+                fbreak;
+            }
+            *(write_pointer_++) = (char) code_point_;
+        } else if (code_point_ <= 0x7FF) {
+            if ( write_pointer_ == write_limit_ ) {
+                error_col_ = int(fpc - a_json);
+                fbreak;
+            }
+            *(write_pointer_++) = (char) (0xC0 | ((code_point_ >> 6) & 0x1F));
+            if ( write_pointer_ == write_limit_ ) {
+                error_col_ = int(fpc - a_json);
+                fbreak;
+            }
+            *(write_pointer_++) = (char) (0x80 | (code_point_ & 0x3F));
+        } else { // if ( a_char_code < 0xFFFF) {
+            if ( write_pointer_ == write_limit_ ) {
+                error_col_ = int(fpc - a_json);
+                fbreak;
+            }
+            *(write_pointer_++) = (char) (0xE0 | ((code_point_ >> 12) & 0x0F));
+            if ( write_pointer_ == write_limit_ ) {
+                error_col_ = int(fpc - a_json);
+                fbreak;
+            }
+            *(write_pointer_++) = (char) (0x80 | ((code_point_ >> 6)  & 0x3F));
+            if ( write_pointer_ == write_limit_ ) {
+                error_col_ = int(fpc - a_json);
+                fbreak;
+            }
+            *(write_pointer_++) = (char) (0x80 | (code_point_ & 0x3F));
+        }
+    }
+
+    action start_char_sequence
+    {
+        if ( write_failed_ == true || write_pointer_ + sizeof(int32_t)  >= write_limit_ ) {
+            error_col_ = int(fpc - a_json);
+            fbreak;
+        } else {
+            // keep track of this address
+            write_start_ = write_pointer_;
+
+            int32_t tmp = 0;
+            CopyBytes(write_start_, (int8_t*) &tmp, sizeof(tmp));
+            write_pointer_ += sizeof(tmp);
+        }
+    }
+
+    action terminate_char_sequence
+    {
+        if ( write_pointer_ == write_limit_ ) {
+            error_col_ = int(fpc - a_json);
+            fbreak;
+        }
+        *(write_pointer_++) = 0;
+        //
+        int32_t tmp = (int32_t)(write_pointer_ - write_start_ - sizeof(int32_t));
+        CopyBytes(write_start_, (int8_t*) &tmp, sizeof(tmp));
+    }
+
+    action save_obj
+    {
+        if ( write_failed_ == true ) {
+            error_col_ = int(fpc - a_json);
+            fbreak;
+        }
+    }
+
+    action save_char_seq
+    {
+        if ( write_failed_ == true ) {
+            error_col_ = int(fpc - a_json);
+            fbreak;
+        }
+    }
+
+    qcharsequence = ('"' >start_char_sequence
+                         ( [^\\"]  $copy_character                   |
+                         ( '\\' ["\\\/bfnrt]  $escape_character )    |
+                         ( '\\' 'u' >unicode_start xdigit{4} $unicode_decode %unicode_end ) )* '"' %terminate_char_sequence ) | ( 'null' >start_char_sequence %terminate_char_sequence );
+
+    ####################################################
+    # Generic dummy JSON values
+    ####################################################
+
+    balanced = [^{}\[\]] | '[' @{ fcall balancedTokensBracket; }
+                         | '{' @{ fcall balancedTokensBrace;   };
+    balancedTokensBracket := balanced* ']' @{ fret; };
+    balancedTokensBrace   := balanced* '}' @{ fret; };
+
+    json_dummy_value     = ( number | qstring | 'true' | 'false' | 'null' | balanced );
+    json_dummy_key_value = ( '"' [a-z_][a-zA-Z0-9]+ '"' ws* ':' ws* json_dummy_value ws*);
+    json_dummy_object    = ( ws* '{' zlen | (ws* json_dummy_key_value, (ws*, ws* json_dummy_key_value)) ws* '}' ws*);
+    json_dummy_array     = ( ws* '[' zlen | (ws* json_dummy_value (ws*, ws* json_dummy_value)*) ws* ']' ws*);
+
+    prepush {
+        if ( stack_size_ == 0 ) {
+            stack_size_ = 20;
+            stack_ = (int*) malloc(sizeof(int) * stack_size_);
+        }
+        if ( top_ == stack_size_ -1 ) {
+            stack_size_ *= 2;
+            stack_ = (int*) realloc(stack_, sizeof(int) * stack_size_);
+        }
+    }
+
+    action parse_error
+    {
+        if ( a_json != NULL ) {
+            error_col_ = int(fpc - a_json);
+            if ( true ) {
+                // DEBUGTRACE("cldware", "parse_error near col %d(%c)\n", error_col_, fc);
+            }
+        }
+        fbreak;
+    }
+
+    #
+    # ERROR CONTROL
+    #
+
+    action open_error_code
+    {
+        success_ = false;
+    }
+
+    action close_error_code
+    {
+        write_pointer_ = write_buffer_;
+    }
+
+}%%
+                                 
+#pragma GCC diagnostic pop
