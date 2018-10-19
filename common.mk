@@ -74,7 +74,7 @@ endif
 OUT_DIR_FOR_TARGET := $(OUT_DIR)/$(TARGET)
 
 OSAL_HEADERS_DIR := \
-									./src
+		./src
 
 OSAL_SRC := \
 						./src/osal/base_file.cc                           \
@@ -89,26 +89,27 @@ OSAL_SRC := \
 						./src/osal/posix/posix_random.cc                  \
 						./src/osal/posix/posix_thread_helper.cc           \
 						./src/osal/posix/posix_time.cc                    \
-						./src/osal/utf8_string.cc 							          \
+						./src/osal/utf8_string.cc                         \
 						./src/osal/utils/base_64.cc                       \
 						./src/osal/utils/json_parser_base.cc              \
 						./src/osal/utils/pow10.cc                         \
 						./src/osal/utils/utf8_utils
 
 OSAL_RAGEL_SRC := \
-								  ./src/osal/osal_date.rl
+                  ./src/osal/osal_date.rl
 
 RAGEL_SRC := \
             $(OSAL_RAGEL_SRC)
 
-ifndef ICU4C_INCLUDE_DIR
-	ICU4C_INCLUDE_DIR := /usr/local/opt/icu4c/include
+ifndef ICU_INCLUDE_DIRS
+  ICU_INCLUDE_DIRS := /usr/local/opt/icu4c/include
 endif
 
+# includes
 INCLUDE_DIRS := \
-								-I $(OSAL_HEADERS_DIR) \
-								-I /usr/local/include  \
-								-I $(ICU4C_INCLUDE_DIR)
+               -I /usr/local/include  \
+	       -I $(OSAL_HEADERS_DIR) \
+               -I $(ICU_INCLUDE_DIRS)
 
 # compiler flags
 C           := gcc
@@ -132,6 +133,16 @@ else
 endif
 
 # VERSION :=$(shell cat version)
+
+### ###
+
+info-third-party:
+	@echo "---"
+	@echo "- casper-osal/common.mk"
+	@echo "- ICU_INCLUDE_DIRS: $(ICU_INCLUDE_DIRS)"
+	@echo "-"
+
+### ###
 
 # out dir
 mk_out_dir:

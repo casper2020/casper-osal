@@ -26,7 +26,11 @@ OBJECTS  = \
 LIB_NAME:=libosal.a
 A_FILE:=$(OUT_DIR_FOR_TARGET)/$(LIB_NAME)
 
-all: mk_out_dir ragel $(OBJECTS)
+all: info lib
+
+info: info-third-party
+
+lib: mk_out_dir ragel $(OBJECTS)
 	@ar rcs $(A_FILE) $(OBJECTS)
 	@echo "* [$(TARGET)] $(A_FILE) ~> done"
 
