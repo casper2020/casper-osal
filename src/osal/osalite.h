@@ -312,6 +312,8 @@ typedef size_t ssize_t;
     #define LONG_LONG_FMT   "%" "lld"
     #define U_LONG_LONG_FMT "%" "%llu"
 
+    #define DOUBLE_FMT "%lf"
+
 //#else
 //
 //    #if defined(__LP64__) || defined(_LP64)
