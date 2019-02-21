@@ -85,13 +85,13 @@ namespace osal
             
             const int&         GetFileDescriptor         () const;
             
-            const int          GetLastConfigError        () const;
+            int          GetLastConfigError        () const;
             const std::string& GetLastConfigErrorString  () const;
             
-            const int          GetLastSendError          () const;
+            int          GetLastSendError          () const;
             const std::string& GetLastSendErrorString    () const;
             
-            const int          GetLastReceiveError       () const;
+            int          GetLastReceiveError       () const;
             const std::string& GetLastReceiveErrorString () const;
             
         }; // end of class 'DatagramSocket'
@@ -101,7 +101,7 @@ namespace osal
             return fd_;
         }
         
-        inline const int DatagramSocket::GetLastConfigError () const
+        inline int DatagramSocket::GetLastConfigError () const
         {
             return last_error_;
         }
@@ -111,7 +111,7 @@ namespace osal
             return last_error_string_;
         }
 
-        inline const int DatagramSocket::GetLastSendError () const
+        inline int DatagramSocket::GetLastSendError () const
         {
             return last_tx_error_;
         }
@@ -121,7 +121,7 @@ namespace osal
             return last_tx_error_string_;
         }
         
-        inline const int DatagramSocket::GetLastReceiveError () const
+        inline int DatagramSocket::GetLastReceiveError () const
         {
             return last_rx_error_;
         }
