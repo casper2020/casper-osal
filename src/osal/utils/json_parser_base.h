@@ -30,6 +30,8 @@
 #include <string.h>
 #include <math.h>
 
+#include <stdlib.h> // realloc
+
 #include "unicode/normalizer2.h" // U_ICU_NAMESPACE::Normalizer2
 
 namespace osal {
@@ -129,6 +131,8 @@ namespace osal {
 
             bool Success () const;
             const std::string& NormalizeString (const char* a_string);
+            
+            bool ReallocWriterBuffer ();
 
         };
 
@@ -172,6 +176,25 @@ namespace osal {
             }
 
             return icu_normalized_string_;
+        }
+    
+        inline bool JsonParserBase::ReallocWriterBuffer ()
+        {
+            const size_t current_offset  = write_pointer_ - write_start_;
+            
+            write_buffer_capacity_ *= 2;
+            write_buffer_           = (int8_t*)realloc(write_buffer_, sizeof(int8_t) * static_cast<size_t>(write_buffer_capacity_));
+            if ( NULL != write_buffer_ ) {
+                write_start_           = write_buffer_;
+                write_pointer_         = write_buffer_ + current_offset;
+                write_limit_           = write_pointer_ + write_buffer_capacity_;
+            } else {
+                write_buffer_capacity_ = 0;
+                write_start_           = nullptr;
+                write_pointer_         = nullptr;
+                write_limit_           = nullptr;
+            }
+            return ( nullptr != write_buffer_ );
         }
 
     } // endof namespace utils
