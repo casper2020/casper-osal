@@ -156,8 +156,10 @@
     action copy_character
     {
         if ( write_pointer_ == write_limit_ ) {
-            error_col_ = int(fpc - a_json);
-            fbreak;
+            if ( false == ReallocWriterBuffer() ) {
+                error_col_ = int(fpc - a_json);
+                fbreak;
+            }
         }
         *(write_pointer_++) = fc;
     }
@@ -165,8 +167,10 @@
     action escape_character
     {
         if ( write_pointer_ == write_limit_ ) {
-            error_col_ = int(fpc - a_json);
-            fbreak;
+            if ( false == ReallocWriterBuffer() ) {
+                error_col_ = int(fpc - a_json);
+                fbreak;
+            }
         }
 
         switch ( fc ) {
@@ -213,35 +217,47 @@
     {
         if (code_point_ <= 0x7F) {
             if ( write_pointer_ == write_limit_ ) {
-                error_col_ = int(fpc - a_json);
-                fbreak;
+                if ( false == ReallocWriterBuffer() ) {
+                    error_col_ = int(fpc - a_json);
+                    fbreak;
+                }
             }
             *(write_pointer_++) = (char) code_point_;
         } else if (code_point_ <= 0x7FF) {
             if ( write_pointer_ == write_limit_ ) {
-                error_col_ = int(fpc - a_json);
-                fbreak;
+                if ( false == ReallocWriterBuffer() ) {
+                    error_col_ = int(fpc - a_json);
+                    fbreak;
+                }
             }
             *(write_pointer_++) = (char) (0xC0 | ((code_point_ >> 6) & 0x1F));
             if ( write_pointer_ == write_limit_ ) {
-                error_col_ = int(fpc - a_json);
-                fbreak;
+                if ( false == ReallocWriterBuffer() ) {
+                    error_col_ = int(fpc - a_json);
+                    fbreak;
+                }
             }
             *(write_pointer_++) = (char) (0x80 | (code_point_ & 0x3F));
         } else { // if ( a_char_code < 0xFFFF) {
             if ( write_pointer_ == write_limit_ ) {
-                error_col_ = int(fpc - a_json);
-                fbreak;
+                if ( false == ReallocWriterBuffer() ) {
+                    error_col_ = int(fpc - a_json);
+                    fbreak;
+                }
             }
             *(write_pointer_++) = (char) (0xE0 | ((code_point_ >> 12) & 0x0F));
             if ( write_pointer_ == write_limit_ ) {
-                error_col_ = int(fpc - a_json);
-                fbreak;
+                if ( false == ReallocWriterBuffer() ) {
+                    error_col_ = int(fpc - a_json);
+                    fbreak;
+                }
             }
             *(write_pointer_++) = (char) (0x80 | ((code_point_ >> 6)  & 0x3F));
             if ( write_pointer_ == write_limit_ ) {
-                error_col_ = int(fpc - a_json);
-                fbreak;
+                if ( false == ReallocWriterBuffer() ) {
+                    error_col_ = int(fpc - a_json);
+                    fbreak;
+                }
             }
             *(write_pointer_++) = (char) (0x80 | (code_point_ & 0x3F));
         }
@@ -265,8 +281,10 @@
     action terminate_char_sequence
     {
         if ( write_pointer_ == write_limit_ ) {
-            error_col_ = int(fpc - a_json);
-            fbreak;
+            if ( false == ReallocWriterBuffer() ) {
+                error_col_ = int(fpc - a_json);
+                fbreak;
+            }
         }
         *(write_pointer_++) = 0;
         //
