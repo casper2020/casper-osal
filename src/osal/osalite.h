@@ -170,6 +170,9 @@
     #undef OSALITE_DECLARE_VAR_IF_DEBUG
     #define OSALITE_DECLARE_VAR_IF_DEBUG(a_type, a_name) a_type a_name
 
+    #undef OSALITE_DECLARE_CONST_IF_DEBUG
+    #define OSALITE_DECLARE_CONST_IF_DEBUG(a_type, a_name, a_value) const a_type a_name = a_value
+
     #define OSALITE_DECLARE_SWATCH_IF_DEBUG(a_name) OSALITE_DECLARE_VAR_IF_DEBUG(osal::utils::Swatch, a_name)
     #define OSALITE_START_SWATCH_IF_DEBUG(a_swatch) a_swatch.Start()
     #define OSALITE_STOP_SWATCH_IF_DEBUG(a_swatch) a_swatch.Stop()
@@ -179,6 +182,9 @@
 
     #undef OSALITE_DECLARE_VAR_IF_DEBUG
     #define OSALITE_DECLARE_VAR_IF_DEBUG(a_type, a_name)
+
+    #undef OSALITE_DECLARE_CONST_IF_DEBUG
+    #define OSALITE_DECLARE_CONST_IF_DEBUG(a_type, a_name, a_value)
 
     #undef OSALITE_DECLARE_SWATCH_IF_DEBUG
     #define OSALITE_DECLARE_SWATCH_IF_DEBUG(a_name)
