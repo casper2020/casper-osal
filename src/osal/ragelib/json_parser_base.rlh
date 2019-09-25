@@ -155,9 +155,10 @@
 
     action copy_character
     {
-        if ( write_pointer_ == write_limit_ ) {
+        if ( false == WriteBufferHasEnoughSpace(sizeof(fc)) ) {
             if ( false == ReallocWriterBuffer() ) {
-                error_col_ = int(fpc - a_json);
+                last_error_ = "realloc failed @ 'copy_character'";
+                error_col_  = int(fpc - a_json);
                 fbreak;
             }
         }
@@ -166,9 +167,10 @@
 
     action escape_character
     {
-        if ( write_pointer_ == write_limit_ ) {
-            if ( false == ReallocWriterBuffer() ) {
-                error_col_ = int(fpc - a_json);
+        if ( false == WriteBufferHasEnoughSpace(2 * sizeof(fc)) ) {
+            if ( false == ReallocWriterBuffer(2 * sizeof(fc)) ) {
+                last_error_ = "realloc failed @ 'escape_character'";
+                error_col_   = int(fpc - a_json);
                 fbreak;
             }
         }
@@ -216,46 +218,52 @@
     action unicode_end
     {
         if (code_point_ <= 0x7F) {
-            if ( write_pointer_ == write_limit_ ) {
+            if ( false == WriteBufferHasEnoughSpace(sizeof(char)) ) {
                 if ( false == ReallocWriterBuffer() ) {
-                    error_col_ = int(fpc - a_json);
+                    last_error_ = "realloc failed @ 'unicode_end' (1)";
+                    error_col_  = int(fpc - a_json);
                     fbreak;
                 }
             }
             *(write_pointer_++) = (char) code_point_;
         } else if (code_point_ <= 0x7FF) {
-            if ( write_pointer_ == write_limit_ ) {
+            if ( false == WriteBufferHasEnoughSpace(sizeof(char)) ) {
                 if ( false == ReallocWriterBuffer() ) {
-                    error_col_ = int(fpc - a_json);
+                    last_error_ = "realloc failed @ 'unicode_end' (2)";
+                    error_col_  = int(fpc - a_json);
                     fbreak;
                 }
             }
             *(write_pointer_++) = (char) (0xC0 | ((code_point_ >> 6) & 0x1F));
-            if ( write_pointer_ == write_limit_ ) {
+            if ( false == WriteBufferHasEnoughSpace(sizeof(char)) ) {
                 if ( false == ReallocWriterBuffer() ) {
-                    error_col_ = int(fpc - a_json);
+                    last_error_ = "realloc failed @ 'unicode_end' (3)";
+                    error_col_  = int(fpc - a_json);
                     fbreak;
                 }
             }
             *(write_pointer_++) = (char) (0x80 | (code_point_ & 0x3F));
         } else { // if ( a_char_code < 0xFFFF) {
-            if ( write_pointer_ == write_limit_ ) {
+            if ( false == WriteBufferHasEnoughSpace(sizeof(char)) ) {
                 if ( false == ReallocWriterBuffer() ) {
-                    error_col_ = int(fpc - a_json);
+                    last_error_ = "realloc failed @ 'unicode_end' (4)";
+                    error_col_  = int(fpc - a_json);
                     fbreak;
                 }
             }
             *(write_pointer_++) = (char) (0xE0 | ((code_point_ >> 12) & 0x0F));
-            if ( write_pointer_ == write_limit_ ) {
+            if ( false == WriteBufferHasEnoughSpace(sizeof(char)) ) {
                 if ( false == ReallocWriterBuffer() ) {
+                    last_error_ = "realloc failed @ 'unicode_end' (5)";
                     error_col_ = int(fpc - a_json);
                     fbreak;
                 }
             }
             *(write_pointer_++) = (char) (0x80 | ((code_point_ >> 6)  & 0x3F));
-            if ( write_pointer_ == write_limit_ ) {
+            if ( false == WriteBufferHasEnoughSpace(sizeof(char)) ) {
                 if ( false == ReallocWriterBuffer() ) {
-                    error_col_ = int(fpc - a_json);
+                    last_error_ = "realloc failed @ 'unicode_end' (6)";
+                    error_col_  = int(fpc - a_json);
                     fbreak;
                 }
             }
@@ -265,8 +273,9 @@
 
     action start_char_sequence
     {
-        if ( write_failed_ == true || write_pointer_ + sizeof(int32_t)  >= write_limit_ ) {
-            error_col_ = int(fpc - a_json);
+        if ( write_failed_ == true || ( false == WriteBufferHasEnoughSpace(sizeof(int32_t)) && false == ReallocWriterBuffer(sizeof(int32_t)) ) ) {
+            last_error_ = "realloc failed @ 'start_char_sequence'";
+            error_col_  = int(fpc - a_json);
             fbreak;
         } else {
             // keep track of this address
@@ -280,9 +289,10 @@
 
     action terminate_char_sequence
     {
-        if ( write_pointer_ == write_limit_ ) {
+        if ( false == WriteBufferHasEnoughSpace(sizeof(char)) ) {
             if ( false == ReallocWriterBuffer() ) {
-                error_col_ = int(fpc - a_json);
+                last_error_ = "realloc failed @ 'terminate_char_sequence'";
+                error_col_  = int(fpc - a_json);
                 fbreak;
             }
         }
@@ -295,7 +305,8 @@
     action save_obj
     {
         if ( write_failed_ == true ) {
-            error_col_ = int(fpc - a_json);
+            last_error_ = "write failed @ 'save_obj'";
+            error_col_  = int(fpc - a_json);
             fbreak;
         }
     }
@@ -303,7 +314,8 @@
     action save_char_seq
     {
         if ( write_failed_ == true ) {
-            error_col_ = int(fpc - a_json);
+            last_error_ = "write failed @ 'save_char_seq'";
+            error_col_  = int(fpc - a_json);
             fbreak;
         }
     }
@@ -341,7 +353,8 @@
     action parse_error
     {
         if ( a_json != NULL ) {
-            error_col_ = int(fpc - a_json);
+            last_error_ = "write failed @ 'parse_error'";
+            error_col_  = int(fpc - a_json);
             if ( true ) {
                 // DEBUGTRACE("cldware", "parse_error near col %d(%c)\n", error_col_, fc);
             }
