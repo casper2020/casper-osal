@@ -58,6 +58,7 @@ namespace osal
             void     Start ();
             bool     AtMainThread    () const;
             ThreadID CurrentThreadID () const;
+            void     SetName (const std::string& a_name) const;
             
         };
         
@@ -94,6 +95,20 @@ namespace osal
 			#else
 			    return (uint64_t)syscall(SYS_gettid);
 			#endif
+        }
+    
+        /**
+         * @brief Set thread name.
+         * *
+         * @param a_name
+         */
+        inline void ThreadHelper::SetName (const std::string& a_name) const
+        {
+             #ifdef __APPLE__
+                 pthread_setname_np(a_name.c_str());
+             #else
+                 pthread_setname_np(pthread_self(), a_name.c_str());
+             #endif
         }
         
     } // end of namespace posix
