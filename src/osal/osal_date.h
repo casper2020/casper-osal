@@ -24,6 +24,7 @@
 #define NRS_OSAL_DATE_H_
 
 #include <string>
+#include <time.h> // time_t
 
 namespace osal
 {
