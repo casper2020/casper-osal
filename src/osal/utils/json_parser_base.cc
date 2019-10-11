@@ -117,6 +117,7 @@ bool osal::utils::JsonParserBase::InitParse ()
 {
     error_col_        = -1;
     parse_completed_  = false;
+    last_error_       = "";
     return true;
 }
 

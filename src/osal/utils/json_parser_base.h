@@ -98,7 +98,8 @@ namespace osal {
 
         protected:
 
-            bool     success_;
+            bool        success_;
+            std::string last_error_;
 
         protected: // ICU
 
@@ -130,9 +131,11 @@ namespace osal {
             static void CopyBytes (int8_t* a_dst, int8_t* a_src, int32_t a_size);
 
             bool Success () const;
+            const std::string& LastError () const;
             const std::string& NormalizeString (const char* a_string);
             
-            bool ReallocWriterBuffer ();
+            bool WriteBufferHasEnoughSpace (size_t a_amount);
+            bool ReallocWriterBuffer (size_t a_min_amount = 0);
 
         };
 
@@ -156,6 +159,11 @@ namespace osal {
         {
             return success_;
         }
+    
+        inline const std::string& JsonParserBase::LastError () const
+        {
+            return last_error_;
+        }
 
         inline const std::string& JsonParserBase::NormalizeString (const char* a_string)
         {
@@ -178,12 +186,19 @@ namespace osal {
             return icu_normalized_string_;
         }
     
-        inline bool JsonParserBase::ReallocWriterBuffer ()
+        inline bool JsonParserBase::WriteBufferHasEnoughSpace (size_t a_amount)
+        {
+            return ( ( (write_pointer_ - write_start_) + a_amount )  <= write_buffer_capacity_ );
+        }
+    
+        inline bool JsonParserBase::ReallocWriterBuffer (size_t a_min_amount)
         {
             const size_t current_offset  = write_pointer_ - write_start_;
-            
             write_buffer_capacity_ *= 2;
-            write_buffer_           = (int8_t*)realloc(write_buffer_, sizeof(int8_t) * static_cast<size_t>(write_buffer_capacity_));
+            if ( 0 != a_min_amount && write_buffer_capacity_ < static_cast<uint32_t>(a_min_amount) ) {
+                write_buffer_capacity_ += ( static_cast<uint32_t>(a_min_amount) - write_buffer_capacity_ );
+            }
+            write_buffer_ = (int8_t*)realloc(write_buffer_, sizeof(int8_t) * static_cast<size_t>(write_buffer_capacity_));
             if ( NULL != write_buffer_ ) {
                 write_start_           = write_buffer_;
                 write_pointer_         = write_buffer_ + current_offset;
