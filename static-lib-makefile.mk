@@ -19,24 +19,15 @@
 
 include common.mk
 
-OBJECTS  = \
-		   $(OSAL_SRC:.cc=.o) \
-		   $(RAGEL_SRC:.rl=.o)
+EXECUTABLE_NAME     :=
+EXECUTABLE_MAIN_SRC :=
+LIBRARY_TYPE        := static
+LIBRARY_NAME        := libosal.a
+CHILD_CWD           := $(CURDIR)
+CHILD_MAKEFILE      := $(MAKEFILE_LIST)
 
-LIB_NAME:=libosal.a
-A_FILE:=$(OUT_DIR_FOR_TARGET)/$(LIB_NAME)
+include ../casper-packager/common/c++/common.mk
 
-all: info lib
-
-info: info-third-party
-
-lib: mk_out_dir ragel $(OBJECTS)
-	@ar rcs $(A_FILE) $(OBJECTS)
-	@echo "* [$(TARGET)] $(A_FILE) ~> done"
-
-clean_lib:
-	@echo "* [clean] $(LIB_NAME)..."
-	@rm -f $(OBJECTS)
-	@rm -f $(A_FILE)
+all: lib
 
 .SECONDARY:
