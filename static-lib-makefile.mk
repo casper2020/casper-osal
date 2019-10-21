@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011-2018 Cloudware S.A. All rights reserved.
+# Copyright (c) 2011-2019 Cloudware S.A. All rights reserved.
 #
 # This file is part of casper-osal.
 #
@@ -17,16 +17,50 @@
 # along with osal.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include common.mk
+THIS_DIR := $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+ifeq (casper-osal, $(shell basename $(THIS_DIR)))
+  PACKAGER_DIR := $(abspath $(THIS_DIR)/../casper-packager)
+else
+  PACKAGER_DIR := $(abspath $(THIS_DIR)/..)
+endif
 
-EXECUTABLE_NAME     :=
+include $(PACKAGER_DIR)/common/c++/settings.mk
+
+PROJECT_SRC_DIR     := $(ROOT_DIR)/casper-osal
+EXECUTABLE_NAME     := 
 EXECUTABLE_MAIN_SRC :=
 LIBRARY_TYPE        := static
 LIBRARY_NAME        := libosal.a
-CHILD_CWD           := $(CURDIR)
-CHILD_MAKEFILE      := $(MAKEFILE_LIST)
+VERSION             := $(shell cat $(PROJECT_SRC_DIR)/VERSION)
+CHILD_CWD           := $(THIS_DIR)
+CHILD_MAKEFILE      := $(firstword $(MAKEFILE_LIST))
 
-include ../casper-packager/common/c++/common.mk
+############################                                                                                                                                                                                                                  
+# OSAL VARIABLES                                                                                                                                                                                                                              
+############################    
+
+include $(PROJECT_SRC_DIR)/common.mk
+
+############################
+# COMMON REQUIRED VARIABLES
+############################
+
+CC_SRC := \
+  $(OSAL_CC_SRC)
+
+RAGEL_SRC := \
+  $(OSAL_RAGEL_SRC)
+
+INCLUDE_DIRS := \
+  -I $(PROJECT_SRC_DIR)/src
+
+OBJECTS := \
+  $(OSAL_CC_SRC:.cc=.o) \
+  $(RAGEL_SRC:.rl=.o)
+
+include $(PACKAGER_DIR)/common/c++/common.mk
+
+set-dependencies: icu-dep-on
 
 all: lib
 
