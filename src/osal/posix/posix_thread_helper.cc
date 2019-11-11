@@ -21,6 +21,8 @@
 
 #include "osal/posix/posix_thread_helper.h"
 
+#include <signal.h> // sigaddset
+
 const osal::posix::ThreadHelper::ThreadID osal::posix::ThreadHelper::k_invalid_thread_id_ = 0;
 
-osal::posix::ThreadHelper::ThreadID osal::posix::ThreadHelper::main_thread_id_            = osal::posix::ThreadHelper::k_invalid_thread_id_;
+osal::posix::ThreadHelper::ThreadID osal::posix::ThreadHelper::main_thread_id_ = osal::posix::ThreadHelper::k_invalid_thread_id_;
