@@ -32,7 +32,12 @@
 
 #include <stdlib.h> // realloc
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+
 #include "unicode/normalizer2.h" // U_ICU_NAMESPACE::Normalizer2
+
+#pragma GCC diagnostic pop
 
 namespace osal {
 
@@ -188,12 +193,12 @@ namespace osal {
     
         inline bool JsonParserBase::WriteBufferHasEnoughSpace (size_t a_amount)
         {
-            return ( ( (write_pointer_ - write_start_) + a_amount )  <= write_buffer_capacity_ );
+            return ( ( static_cast<uint32_t>(write_pointer_ - write_start_) + static_cast<uint32_t>(a_amount) ) <= write_buffer_capacity_ );
         }
     
         inline bool JsonParserBase::ReallocWriterBuffer (size_t a_min_amount)
         {
-            const size_t current_offset  = write_pointer_ - write_start_;
+            const size_t current_offset  = static_cast<size_t>(write_pointer_ - write_start_);
             write_buffer_capacity_ *= 2;
             if ( 0 != a_min_amount && write_buffer_capacity_ < static_cast<uint32_t>(a_min_amount) ) {
                 write_buffer_capacity_ += ( static_cast<uint32_t>(a_min_amount) - write_buffer_capacity_ );

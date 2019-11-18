@@ -44,7 +44,7 @@
     action dgt
     {
         integer_ *= 10;
-        integer_ += (fc - '0');
+        integer_ += uint64_t(fc - '0');
     }
 
     action frac
@@ -52,7 +52,7 @@
         if ( ( fractional_digits_cnt_ + 1 ) < k_max_fractional_digits_ ) {
             fractional_ *= 10;
             divider_    *= 10;
-            fractional_ += (fc - '0');
+            fractional_ += uint64_t(fc - '0');
             fractional_digits_cnt_++;
         }
     }
@@ -60,7 +60,7 @@
     action exp
     {
         exponent_ *= 10;
-        exponent_ += (fc - '0');
+        exponent_ += uint64_t(fc - '0');
     }
 
     action exp_sign
@@ -86,7 +86,7 @@
     action parse_number
     {
         if ( divider_ == 1 && exponent_ == 0 ) {
-            integer_value_ = negative_ ? -integer_ : integer_;
+            integer_value_ = negative_ ? ( -1 * int64_t(integer_) ) : int64_t(integer_);
             double_value_  = integer_value_;
         } else {
             if ( negative_ == false ) {

@@ -280,10 +280,12 @@ typedef size_t ssize_t;
 // Local includes
 #if defined(ANDROID) || defined(_WIN32)
     #define SIZET_FMT "%d"
+    #define SSIZET_FMT "%d"
     #define SIZET_FMT_BP(d)   "%" #d "d"
     #define SSIZET_FMT_BP(d)  "%" #d "d"
 #else
     #define SIZET_FMT "%zd"
+    #define SSIZET_FMT "%d"
     #define SIZET_FMT_BP(d)   "%" #d "zu"
     #define SSIZET_FMT_BP(d)  "%" #d "zd"
 #endif
@@ -308,6 +310,7 @@ typedef size_t ssize_t;
 
     #define UINT64_FMT       "%" PRIu64
     #define UINT64_FMT_ZP(d) "%0" #d PRIu64
+    #define UINT64_FMT_P(d)  "%" #d PRIu64
 
     #define LONG_FMT  "%" PRIdPTR
     #define ULONG_FMT "%" PRIuPTR

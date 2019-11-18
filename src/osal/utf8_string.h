@@ -102,7 +102,7 @@ namespace osal
         }
 
         do {
-            current_char = *(current_ptr++);
+            current_char = static_cast<uint16_t>(*(current_ptr++));
             if ( current_char >= 0x80 ) {
                 if ( (current_char & 0xE0) == 0xC0 ) {
                     current_char &= 0x1F;
@@ -204,7 +204,7 @@ namespace osal
      */
     inline uint16_t UTF8StringIteraror::Next ()
     {
-        current_char_ = *(current_ptr_++);
+        current_char_ = static_cast<uint16_t>(*(current_ptr_++));
         if ( current_char_ >= 0x80 ) {
             if ( (current_char_ & 0xE0) == 0xC0 ) {
                 current_char_ &= 0x1F;
