@@ -32,6 +32,8 @@
     #include <sys/syscall.h> 
 #endif
 
+#include <set> // std::set
+
 namespace osal
 {
     
@@ -58,6 +60,10 @@ namespace osal
             void     Start ();
             bool     AtMainThread    () const;
             ThreadID CurrentThreadID () const;
+
+	public: // Static Method(s) / Function(s)
+
+	    static void BlockSignals (const std::set<int>& a_signals);
             
         };
         

@@ -21,6 +21,31 @@
 
 #include "osal/posix/posix_thread_helper.h"
 
+#include "osal/exception.h"
+
+#include <signal.h>  // sigaddset
+#include <string.h>
+
 const osal::posix::ThreadHelper::ThreadID osal::posix::ThreadHelper::k_invalid_thread_id_ = 0;
 
 osal::posix::ThreadHelper::ThreadID osal::posix::ThreadHelper::main_thread_id_            = osal::posix::ThreadHelper::k_invalid_thread_id_;
+
+/**
+ * @brief Static helper method to block current thead signals.
+ *
+ * @param a_signals Set of signals to block.
+ *
+ * @remarks sigemptyset and sigaddset are async-signal-safe according to the POSIX standard.
+ */
+void osal::posix::ThreadHelper::BlockSignals (const std::set<int>& a_signals)
+{
+  sigset_t mask;
+  sigemptyset (&mask);
+  for ( auto signal : a_signals ) {
+    sigaddset(&mask, signal);
+  }
+  const int rv = pthread_sigmask(SIG_BLOCK, &mask, nullptr);
+  if ( 0 != rv ) {
+    throw OSAL_EXCEPTION("Unable to block thread signals: %d - %s!", rv, strerror(rv));
+  }
+}
