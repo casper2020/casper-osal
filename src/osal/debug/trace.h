@@ -34,6 +34,10 @@
 #include <stdarg.h>
 #include <mutex> // std::mutext, std::lock_guard
 
+#include <sys/types.h>
+#include <sys/stat.h> // chmod
+#include <unistd.h> // getpid, chown
+
 #define OSAL_DEBUG_TRACE_LOCK_GUARD() \
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -48,16 +52,37 @@ namespace osal
          */
         class Trace final : public osal::Singleton<Trace>
         {
-            
+
+        public: // Data Type(s)
+              
+              class RegistrationException : public std::exception {
+                  
+              private: // Data
+                  
+                  const std::string what_;
+                  
+              public: // Constructor / Destructor
+                  
+                  RegistrationException (const std::string& a_what)
+                    : what_(a_what)
+                  {
+                      // ... empty ...
+                  }
+                  
+                  virtual ~RegistrationException ()
+                  {
+                      // ... empty ...
+                  }
+                  
+              public:
+                  
+                  const char* what() const noexcept {return what_.c_str();}
+                  
+              };
+          
         private: // Static Data
             
             std::mutex mutex_;
-
-        public: // Data Types
-
-            struct OutOfMemoryException : std::exception {
-                const char* what() const noexcept {return "Out Of Memory!";}
-            };
 
         protected: // Data Types
 
@@ -70,10 +95,11 @@ namespace osal
             public: // Const Data
 
                 const std::string name_;
+                const std::string uri_;
 
             public: // Data
 
-                FILE* file_;
+                FILE* fp_;
 
             public: // Constructor(s) / Destructor
 
@@ -82,8 +108,8 @@ namespace osal
                  *
                  * @param a_name The token name.
                  */
-                Token (const std::string& a_name, FILE* a_file)
-                : name_(a_name), file_(a_file)
+                Token (const std::string& a_name, const std::string& a_uri, FILE* a_file)
+                : name_(a_name), uri_(a_uri), fp_(a_file)
                 {
                     /* empty */
                 }
@@ -103,6 +129,11 @@ namespace osal
             std::map<std::string, Token*> tokens_;
             char*                 buffer_;
             size_t                buffer_capacity_;
+            
+        private: // Data
+
+            uid_t user_id_;
+            gid_t group_id_;
 
         public: // Initialization / Release API - Method(s) / Function(s)
 
@@ -114,6 +145,7 @@ namespace osal
             void     Register     (const std::string& a_token, FILE* a_file);
             void     Register     (const std::string& a_token, const std::string& a_file);
             bool     IsRegistered (const char* const a_token);
+            void     Recycle      ();
 
         public: // Log API - Method(s) / Function(s)
 
@@ -122,8 +154,15 @@ namespace osal
 
         private: //
 
-            bool     IsRegistered (const std::string& a_token) const;
             bool     EnsureBufferCapacity (const size_t& a_capacity);
+
+        private: // Method(s) / Function(s)
+            
+            bool EnsureOwnership ();
+
+        public: // Method(s) / Function(s)
+            
+            bool EnsureOwnership (uid_t a_user_id, gid_t a_group_id);
 
         }; // end of class Trace
 
@@ -135,6 +174,9 @@ namespace osal
             OSAL_DEBUG_TRACE_LOCK_GUARD();
             buffer_          = new char[1024];
             buffer_capacity_ = nullptr != buffer_ ? 1024 : 0;
+            user_id_         = UINT32_MAX;
+            group_id_        = UINT32_MAX;
+
         }
 
         /**
@@ -166,19 +208,12 @@ namespace osal
                 return;
             }
             // ... already registered? ...
-            if ( true == IsRegistered(a_token) ) {
+            if ( tokens_.end() != tokens_.find(a_token) ) {
                 // ... yes ..
                 return;
             }
-            // ... try create it ...
-            Token* token = new Token(a_token, a_file);
-            if ( nullptr != token ) {
-                // ... keep track of it ...
-                tokens_[a_token] = token;
-            } else {
-                // ... failure ...
-                throw OutOfMemoryException();
-            }
+            // ... keep track of it ...
+            tokens_[a_token] = new Token(a_token, "", a_file);
         }
 
         /**
@@ -186,15 +221,18 @@ namespace osal
          *
          * @param a_token The token name.
          */
-        inline void Trace::Register (const std::string& a_token, const std::string& a_file)
+        inline void Trace::Register (const std::string& a_token, const std::string& a_uri)
         {
-            FILE* f = fopen(a_file.c_str(), "a");
-            if ( nullptr != f ) {
-                try {
-                    Register(a_token, f);
-                } catch (const std::exception& a_exception) {
-                    fclose(f);
-                }
+            OSAL_DEBUG_TRACE_LOCK_GUARD();
+            // ... already registered? ...
+            if ( tokens_.end() != tokens_.find(a_token) ) {
+                // ... yes ..
+                return;
+            }
+            // ... open file and keep track of it ...
+            FILE* fp = fopen(a_uri.c_str(), "a");
+            if ( nullptr != fp ) {
+                tokens_[a_token] = new Token(a_token, a_uri, fp);
             }
         }
         
@@ -210,6 +248,38 @@ namespace osal
             OSAL_DEBUG_TRACE_LOCK_GUARD();
             return tokens_.end() != tokens_.find(a_token);
         }
+    
+        /**
+         * @brief Re-open log files ( if any ).
+         */
+        inline void Trace::Recycle ()
+        {
+            OSAL_DEBUG_TRACE_LOCK_GUARD();
+            // ... for all tokens ...
+            for ( auto it : tokens_ ) {
+                // ... if no file is open ...
+                if ( stdout == it.second->fp_ || stderr == it.second->fp_ ) {
+                    // ... next ...
+                    continue;
+                }
+                // ... else close ...
+                if ( nullptr != it.second->fp_ ) {
+                    fclose(it.second->fp_);
+                }
+                // ... and reopen it ...
+                it.second->fp_ = fopen(it.second->uri_.c_str(), "w");
+                if ( nullptr == it.second->fp_ ) {
+                    const char* const err_str = strerror(errno);
+                    throw RegistrationException(
+                        "An error occurred while creating rotating log file '" + it.second->uri_ + "': " + std::string(nullptr != err_str ? err_str : "nullptr") + " !"
+                    );
+                }
+                // ... write a comment line ...
+                fprintf(it.second->fp_, "---- NEW LOG '%s' ----\n", it.second->uri_.c_str());
+                fflush(it.second->fp_);
+            }
+            EnsureOwnership();
+        }
         
         /**
          * @brief Output a log message if the provided token is registered.
@@ -222,7 +292,7 @@ namespace osal
         {
             OSAL_DEBUG_TRACE_LOCK_GUARD();
             // ...if token is not registered...
-            if ( false == IsRegistered(a_token) ) {
+            if ( tokens_.end() == tokens_.find(a_token) ) {
                 // ... we're done ...
                 return;
             }
@@ -263,9 +333,9 @@ namespace osal
 
             // ... ready to output the message ? ...
             if ( aux > 0 && static_cast<size_t>(aux) < buffer_capacity_ ) {
-                auto file = tokens_.find(a_token)->second->file_;
+                auto file = tokens_.find(a_token)->second->fp_;
                 // ... output message ...
-                fprintf(tokens_.find(a_token)->second->file_, "%s", buffer_);
+                fprintf(tokens_.find(a_token)->second->fp_, "%s", buffer_);
                 // ... flush ...
                 if ( stdout != file && stderr != file ) {
                     fflush(file);
@@ -286,13 +356,7 @@ namespace osal
         {
             OSAL_DEBUG_TRACE_LOCK_GUARD();
             // ...if token is not registered...
-            if ( false == IsRegistered(a_token) ) {
-                // ... we're done ...
-                return;
-            }
-
-            // ...if token is not registered...
-            if ( false == IsRegistered(a_token) ) {
+            if ( tokens_.end() == tokens_.find(a_token) ) {
                 // ... we're done ...
                 return;
             }
@@ -333,7 +397,7 @@ namespace osal
 
             // ... ready to output the message ? ...
             if ( aux > 0 && static_cast<size_t>(aux) < buffer_capacity_ ) {
-                auto file = tokens_.find(a_token)->second->file_;
+                auto file = tokens_.find(a_token)->second->fp_;
                 // ... output message ...
                 if ( nullptr != a_function ) {
                     fprintf(file, "\n[%s] @ %s : %d\n",
@@ -349,18 +413,6 @@ namespace osal
                     fflush(file);
                 }
             }
-        }
-        
-        /**
-         * @brief Check if a token is already registered.
-         *
-         * @param a_token The token name.
-         *
-         * @return True when the token is already registered.
-         */
-        inline bool Trace::IsRegistered (const std::string& a_token) const
-        {
-            return tokens_.end() != tokens_.find(a_token);
         }
         
         /**
@@ -393,6 +445,44 @@ namespace osal
             // ... we're good to go if ...
             return buffer_capacity_ == a_capacity;
         }
+    
+        /**
+         * @brief Change the logs permissions to a specific user / group.
+         *
+         * @return True if all files changed to new permissions or it not needed, false otherwise.
+         */
+        inline bool Trace::EnsureOwnership ()
+        {
+            if ( UINT32_MAX == user_id_ || UINT32_MAX == group_id_ ) {
+                return true;
+            }
+            size_t count = 0;
+            for ( auto it : tokens_ ) {
+                const int chown_status = chown(it.second->uri_.c_str(), user_id_, group_id_);
+                const int chmod_status = chmod(it.second->uri_.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+                if ( 0 == chown_status && 0 == chmod_status ) {
+                    count++;
+                }
+            }
+            return ( tokens_.size() == count );
+        }
+        
+        /**
+         * @brief Change the logs permissions to a specific user / group.
+         *
+         * @param a_user_id
+         * @param a_group_id
+         *
+         * @return True if all files changed to new permissions or it not needed, false otherwise.
+         */
+        inline bool Trace::EnsureOwnership (uid_t a_user_id, gid_t a_group_id)
+        {
+            OSAL_DEBUG_TRACE_LOCK_GUARD();
+            user_id_  = a_user_id;
+            group_id_ = a_group_id;
+            return EnsureOwnership();
+        }
+        
 
     } // end of namesapce debug
 

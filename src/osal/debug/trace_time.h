@@ -51,10 +51,6 @@ namespace osal
 
         public: // Data Types
 
-            struct OutOfMemoryException : std::exception {
-                const char* what() const noexcept {return "Out Of Memory!";}
-            };
-
             struct OutOfBoundsException : std::exception {
                 const char* what() const noexcept {return "Out Of Bounds!";}
             };
@@ -193,15 +189,8 @@ namespace osal
                 // ... yes ..
                 return;
             }
-            // ... try create it ...
-            Token* token = new Token(a_name, a_file);
-            if ( nullptr != token ) {
-                // ... keep track of it ...
-                tokens_[a_key] = token;
-            } else {
-                // ... failure ...
-                throw OutOfMemoryException();
-            }
+            // ... create it and keep track of it ...
+            tokens_[a_key] = new Token(a_name, a_file);
             ResetToken(a_key, "");
         }
 
@@ -419,17 +408,10 @@ namespace osal
             if ( nullptr != buffer_ ) {
                 delete [] buffer_;
             }
-            // ... try to allocate it now ...
+            // ... allocate it now and we're good to go ....
             buffer_ = new char[a_capacity];
-            if ( nullptr == buffer_ ) {
-                // ... out of memory ...
-                buffer_capacity_ = 0;
-                throw OutOfMemoryException();
-            } else {
-                // ... we're good to go ....
-                buffer_[0]       = '\0';
-                buffer_capacity_ = a_capacity;
-            }
+            buffer_[0]       = '\0';
+            buffer_capacity_ = a_capacity;
         }
 
         /**
