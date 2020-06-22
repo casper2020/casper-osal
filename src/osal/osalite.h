@@ -31,7 +31,6 @@
 #include "osal/osalite_conditionals.h"
 #include "osal/exception.h"
 #include "osal/osal_singleton.h"
-#include "osal/thread_helper.h"
 
 #include <assert.h>
 
@@ -96,19 +95,6 @@
         #define OSALITE_ASSERT(a_condition) assert(a_condition)
     #endif
 
-    #undef OSALITE_DEBUG_SET_MAIN_THREAD_ID
-    #define OSALITE_DEBUG_SET_MAIN_THREAD_ID() \
-        osal::ThreadHelper::GetInstance().Start();
-
-    #undef OSALITE_DEBUG_FAIL_IF_NOT_AT_MAIN_THREAD
-    #define OSALITE_DEBUG_FAIL_IF_NOT_AT_MAIN_THREAD() \
-        OSALITE_ASSERT(true == osal::ThreadHelper::GetInstance().AtMainThread())
-
-    #undef OSALITE_DEBUG_FAIL_IF_NOT_AT_THREAD
-    #define OSALITE_DEBUG_FAIL_IF_NOT_AT_THREAD(a_id)[&] { \
-        return osal::ThreadHelper::GetInstance().CurrentThreadID() == a_id; \
-    }
-
 #else
 
     #undef OSAL_DEBUG_STDOUT
@@ -153,15 +139,6 @@
  
     #undef OSALITE_ASSERT
     #define OSALITE_ASSERT(a_condition)
-
-    #undef OSALITE_DEBUG_SET_MAIN_THREAD_ID
-    #define OSALITE_DEBUG_SET_MAIN_THREAD_ID()
-
-    #undef OSALITE_DEBUG_FAIL_IF_NOT_AT_MAIN_THREAD
-    #define OSALITE_DEBUG_FAIL_IF_NOT_AT_MAIN_THREAD()
-
-    #undef OSALITE_DEBUG_FAIL_IF_NOT_AT_THREAD
-    #define OSALITE_DEBUG_FAIL_IF_NOT_AT_THREAD(a_id)
 
 #endif
 
