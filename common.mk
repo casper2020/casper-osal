@@ -32,7 +32,6 @@ OSAL_CC_SRC := \
   $(PROJECT_SRC_DIR)/src/osal/posix/posix_file.cc                    \
   $(PROJECT_SRC_DIR)/src/osal/posix/posix_mutex.cc                   \
   $(PROJECT_SRC_DIR)/src/osal/posix/posix_random.cc                  \
-  $(PROJECT_SRC_DIR)/src/osal/posix/posix_thread_helper.cc           \
   $(PROJECT_SRC_DIR)/src/osal/posix/posix_time.cc                    \
   $(PROJECT_SRC_DIR)/src/osal/utf8_string.cc                         \
   $(PROJECT_SRC_DIR)/src/osal/utils/base_64.cc                       \
