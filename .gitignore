@@ -12,3 +12,6 @@ src/osal/osal_date.cc
 ###############
 *xcuserdata*
 *xcworkspacedata*
+
+# macOS spotlight
+.DS_Store

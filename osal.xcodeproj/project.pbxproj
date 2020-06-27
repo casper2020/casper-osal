@@ -42,8 +42,6 @@
 		47CB40931E23EEBF004FE268 /* posix_mutex.cc in Sources */ = {isa = PBXBuildFile; fileRef = 47CB40371E23EEBF004FE268 /* posix_mutex.cc */; };
 		47CB40941E23EEBF004FE268 /* posix_mutex.h in Headers */ = {isa = PBXBuildFile; fileRef = 47CB40381E23EEBF004FE268 /* posix_mutex.h */; };
 		47CB40951E23EEBF004FE268 /* posix_random.cc in Sources */ = {isa = PBXBuildFile; fileRef = 47CB40391E23EEBF004FE268 /* posix_random.cc */; };
-		47CB40961E23EEBF004FE268 /* posix_thread_helper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 47CB403A1E23EEBF004FE268 /* posix_thread_helper.cc */; };
-		47CB40971E23EEBF004FE268 /* posix_thread_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 47CB403B1E23EEBF004FE268 /* posix_thread_helper.h */; };
 		47CB40991E23EEBF004FE268 /* posix_time.cc in Sources */ = {isa = PBXBuildFile; fileRef = 47CB403D1E23EEBF004FE268 /* posix_time.cc */; };
 		47CB409A1E23EEBF004FE268 /* posix_time.h in Headers */ = {isa = PBXBuildFile; fileRef = 47CB403E1E23EEBF004FE268 /* posix_time.h */; };
 		47CB409B1E23EEBF004FE268 /* posix_worker.cc in Sources */ = {isa = PBXBuildFile; fileRef = 47CB403F1E23EEBF004FE268 /* posix_worker.cc */; };
@@ -116,8 +114,6 @@
 		47CB40371E23EEBF004FE268 /* posix_mutex.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = posix_mutex.cc; sourceTree = "<group>"; };
 		47CB40381E23EEBF004FE268 /* posix_mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = posix_mutex.h; sourceTree = "<group>"; };
 		47CB40391E23EEBF004FE268 /* posix_random.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = posix_random.cc; sourceTree = "<group>"; };
-		47CB403A1E23EEBF004FE268 /* posix_thread_helper.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = posix_thread_helper.cc; sourceTree = "<group>"; };
-		47CB403B1E23EEBF004FE268 /* posix_thread_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = posix_thread_helper.h; sourceTree = "<group>"; };
 		47CB403D1E23EEBF004FE268 /* posix_time.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = posix_time.cc; sourceTree = "<group>"; };
 		47CB403E1E23EEBF004FE268 /* posix_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = posix_time.h; sourceTree = "<group>"; };
 		47CB403F1E23EEBF004FE268 /* posix_worker.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = posix_worker.cc; sourceTree = "<group>"; };
@@ -409,8 +405,6 @@
 				47CB40381E23EEBF004FE268 /* posix_mutex.h */,
 				47CB40371E23EEBF004FE268 /* posix_mutex.cc */,
 				47CB40391E23EEBF004FE268 /* posix_random.cc */,
-				47CB403B1E23EEBF004FE268 /* posix_thread_helper.h */,
-				47CB403A1E23EEBF004FE268 /* posix_thread_helper.cc */,
 				47CB403E1E23EEBF004FE268 /* posix_time.h */,
 				47CB403D1E23EEBF004FE268 /* posix_time.cc */,
 				47CB40401E23EEBF004FE268 /* posix_worker.h */,
@@ -654,7 +648,6 @@
 				47CB40A21E23EEBF004FE268 /* base_64.h in Headers */,
 				47CB407E1E23EEBF004FE268 /* osal_singleton.h in Headers */,
 				47CB40771E23EEBF004FE268 /* mutex.h in Headers */,
-				47CB40971E23EEBF004FE268 /* posix_thread_helper.h in Headers */,
 				47CB40821E23EEBF004FE268 /* osalite_conditionals.h in Headers */,
 				47CB407B1E23EEBF004FE268 /* osal_dir.h in Headers */,
 				47CB40791E23EEBF004FE268 /* osal_date.h in Headers */,
@@ -728,6 +721,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 47CB3FF91E23EE58004FE268;
@@ -753,7 +747,6 @@
 				47CB409B1E23EEBF004FE268 /* posix_worker.cc in Sources */,
 				47CB40751E23EEBF004FE268 /* exception.cc in Sources */,
 				47CB40951E23EEBF004FE268 /* posix_random.cc in Sources */,
-				47CB40961E23EEBF004FE268 /* posix_thread_helper.cc in Sources */,
 				47CB40991E23EEBF004FE268 /* posix_time.cc in Sources */,
 				47CB40A71E23EEBF004FE268 /* pow10.cc in Sources */,
 				47CB40A11E23EEBF004FE268 /* base_64.cc in Sources */,
