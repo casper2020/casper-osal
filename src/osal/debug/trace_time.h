@@ -474,14 +474,14 @@ namespace osal
             for ( uint8_t attempt = 0 ; attempt < 2 ; ++attempt ) {
 
                 buffer_[0] = '\0';
-                aux        = vsnprintf(buffer_, buffer_capacity_ - 1, a_format, a_args);
+                aux        = vsnprintf(buffer_, buffer_capacity_, a_format, a_args);
                 if ( aux < 0 ) {
                     // ... an error has occurred ...
                     buffer_[0] = '\0';
                     break;
                 } else if ( aux > static_cast<int>(buffer_capacity_) ) {
                     // ... realloc buffer ...
-                    EnsureBufferCapacity(static_cast<size_t>(aux + 1));
+                    EnsureBufferCapacity(static_cast<size_t>(aux + sizeof(char)));
                 } else {
                     // ... all done ...
                     break;
