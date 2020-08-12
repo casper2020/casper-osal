@@ -318,7 +318,7 @@ namespace osal
                     break;
                 } else if ( aux > static_cast<int>(buffer_capacity_) ) {
                     // ... realloc buffer ...
-                    if ( true == EnsureBufferCapacity(static_cast<size_t>(aux + sizeof(char))) ) {
+                    if ( true == EnsureBufferCapacity(static_cast<size_t>((unsigned long)aux + sizeof(char))) ) {
                         // ... last attempt to write to buffer ...
                         continue;
                     } else {
@@ -382,7 +382,7 @@ namespace osal
                     break;
                 } else if ( aux > static_cast<int>(buffer_capacity_) ) {
                     // ... realloc buffer ...
-                    if ( true == EnsureBufferCapacity(static_cast<size_t>(aux + sizeof(char))) ) {
+                    if ( true == EnsureBufferCapacity(static_cast<size_t>((unsigned long)aux + sizeof(char))) ) {
                         // ... last attempt to write to buffer ...
                         continue;
                     } else {
