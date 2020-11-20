@@ -126,9 +126,12 @@ void osal::posix::Worker::Abort ()
  */
 int osal::posix::Worker::WorkerRunLoop ()
 {
-#if !(defined(ANDROID) || defined(_WIN32))
+#ifdef __APPLE__
     pthread_setname_np(name_);
+#else
+    pthread_setname_np(pthread_self(), name_);
 #endif
+
     while ( running_ == true ) {
         DEBUGTRACE("Worker", "== worker sleeping\n");
         pthread_mutex_lock(&run_mutex_);

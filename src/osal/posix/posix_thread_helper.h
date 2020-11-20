@@ -61,10 +61,12 @@ namespace osal
             bool     AtMainThread    () const;
             ThreadID CurrentThreadID () const;
 
-	public: // Static Method(s) / Function(s)
+        public: // Static Method(s) / Function(s)
 
-	    static void BlockSignals (const std::set<int>& a_signals);
-            
+            static void BlockSignals (const std::set<int>& a_signals);
+                
+            static void SetThreadName (const std::string& a_name);
+                
         };
         
         /**

@@ -49,3 +49,17 @@ void osal::posix::ThreadHelper::BlockSignals (const std::set<int>& a_signals)
     throw OSAL_EXCEPTION("Unable to block thread signals: %d - %s!", rv, strerror(rv));
   }
 }
+
+/**
+ * @brief Static helper method to set current thead name.
+ *
+ * @param a_name Name to set.
+ */
+void osal::posix::ThreadHelper::SetThreadName (const std::string& a_name)
+{
+#ifdef __APPLE__
+    pthread_setname_np(a_name.c_str());
+#else
+    pthread_setname_np(pthread_self(), a_name.c_str());
+#endif
+}
