@@ -24,6 +24,7 @@
 OSAL_CC_SRC := \
   $(PROJECT_SRC_DIR)/src/osal/base_file.cc                           \
   $(PROJECT_SRC_DIR)/src/osal/exception.cc                           \
+  $(PROJECT_SRC_DIR)/src/osal/debug/trace.cc                          \
   $(PROJECT_SRC_DIR)/src/osal/posix/posix_circular_buffer.cc         \
   $(PROJECT_SRC_DIR)/src/osal/posix/posix_circular_buffer_no_mmap.cc \
   $(PROJECT_SRC_DIR)/src/osal/posix/posix_condition_variable.cc      \

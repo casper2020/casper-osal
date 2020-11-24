@@ -33,6 +33,7 @@
 #include <limits.h>
 #include <stdarg.h>
 #include <mutex> // std::mutext, std::lock_guard
+#include <string.h> // strerror
 
 #include <sys/types.h>
 #include <sys/stat.h> // chmod
@@ -47,11 +48,25 @@ namespace osal
     namespace debug
     {
 
+        // ---- //
+        class Trace;
+        class TraceOneShot final : public ::osal::Initializer<Trace>
+        {
+            
+        public: // Constructor(s) / Destructor
+            
+            TraceOneShot (Trace& a_instance);
+            virtual ~TraceOneShot ();
+            
+        }; // end of class 'TraceOneShot'    
+        
         /**
          * @brief A singleton to log debug messages.
          */
-        class Trace final : public osal::Singleton<Trace>
+        class Trace final : public osal::Singleton<Trace, TraceOneShot>
         {
+            
+            friend class TraceOneShot;
 
         public: // Data Type(s)
               
@@ -482,8 +497,7 @@ namespace osal
             group_id_ = a_group_id;
             return EnsureOwnership();
         }
-        
-
+            
     } // end of namesapce debug
 
 } // end of namespace osal
