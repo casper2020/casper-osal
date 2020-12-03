@@ -155,7 +155,7 @@ namespace osal
         public: // Method(s) / Function(s) declaration
             
             virtual bool Create (const std::string& a_file_name);
-            virtual bool Bind   ();
+            virtual bool Bind   (const bool a_fake = true);
         };
 
     } // end of namespace 'posix'

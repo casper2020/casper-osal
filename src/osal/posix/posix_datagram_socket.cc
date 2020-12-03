@@ -372,7 +372,7 @@ bool osal::posix::DatagramClientSocket::Create (const std::string& a_file_name)
  *
  * @return
  */
-bool osal::posix::DatagramClientSocket::Bind()
+bool osal::posix::DatagramClientSocket::Bind (const bool a_fake)
 {
     if ( osal::posix::DatagramSocket::Step::Bind != next_step_ ) {
         return false;
@@ -380,7 +380,16 @@ bool osal::posix::DatagramClientSocket::Bind()
     
     InitializeAddr();
     
-    next_step_ = osal::posix::DatagramSocket::Step::SendOrReceive;
+    if ( false == a_fake && 0 == last_error_ ) {
+        if ( bind(fd_, (struct sockaddr *)&dst_attr_, dst_addr_len_) < 0 ) {
+            last_error_        = errno;
+            last_error_string_ = strerror(last_error_);
+        } else {
+            last_error_        = 0;
+            last_error_string_ = "";
+            next_step_         = osal::posix::DatagramSocket::Step::SendOrReceive;
+        }
+    }
 
     return 0 == last_error_;
 }
