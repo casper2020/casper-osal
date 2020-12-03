@@ -389,6 +389,8 @@ bool osal::posix::DatagramClientSocket::Bind (const bool a_fake)
             last_error_string_ = "";
             next_step_         = osal::posix::DatagramSocket::Step::SendOrReceive;
         }
+    } else if ( true == a_fake && 0 == last_error_ ) {
+        next_step_ = osal::posix::DatagramSocket::Step::SendOrReceive;
     }
 
     return 0 == last_error_;
