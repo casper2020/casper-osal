@@ -37,7 +37,9 @@
 
 #include <sys/types.h>
 #include <sys/stat.h> // chmod
-#include <unistd.h> // getpid, chown
+#include <pwd.h>      // getpwuid
+#include <grp.h>      // getgrgid
+#include <unistd.h>   // getpid, chown
 
 #define OSAL_DEBUG_TRACE_LOCK_GUARD() \
     std::lock_guard<std::mutex> lock(mutex_);
@@ -147,8 +149,11 @@ namespace osal
             
         private: // Data
 
-            uid_t user_id_;
-            gid_t group_id_;
+            uid_t       user_id_;
+            std::string user_name_;
+            gid_t       group_id_;
+            std::string group_name_;
+            mode_t      mode_;
 
         public: // Initialization / Release API - Method(s) / Function(s)
 
@@ -171,13 +176,14 @@ namespace osal
 
             bool     EnsureBufferCapacity (const size_t& a_capacity);
 
-        private: // Method(s) / Function(s)
-            
-            bool EnsureOwnership ();
-
         public: // Method(s) / Function(s)
             
             bool EnsureOwnership (uid_t a_user_id, gid_t a_group_id);
+
+        private: // Method(s) / Function(s)
+            
+            bool EnsureOwnership ();
+            bool EnsureOwnership (const std::string& a_uri);
 
         }; // end of class Trace
 
@@ -191,7 +197,7 @@ namespace osal
             buffer_capacity_ = nullptr != buffer_ ? 1024 : 0;
             user_id_         = UINT32_MAX;
             group_id_        = UINT32_MAX;
-
+            mode_           = ( S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH );
         }
 
         /**
@@ -289,19 +295,36 @@ namespace osal
                         "An error occurred while creating rotating log file '" + it.second->uri_ + "': " + std::string(nullptr != err_str ? err_str : "nullptr") + " !"
                     );
                 }
-                // ... write a comment line ...
-                fprintf(it.second->fp_, "---- NEW LOG '%s' ----\n", it.second->uri_.c_str());
+            }
+            // ... write a comment line ...
+            for ( auto it : tokens_ ) {
+                // ... skip if not a 'real' file ...
+                if ( stdout == it.second->fp_ || stderr == it.second->fp_ ) {
+                    continue;
+                }
+                // .. ensure write permissions ...
+                (void)EnsureOwnership(it.second->uri_);
+                // ... log recycle messages ...
+                fprintf(it.second->fp_, "--- --- ---\n");
+                fprintf(it.second->fp_, "⌥ LOG FILE   : %s\n", it.second->uri_.c_str());
+                fprintf(it.second->fp_, "⌥ OWNERSHIP  : %4O\n", mode_);
+                if ( not ( ( UINT32_MAX == user_id_ || UINT32_MAX == group_id_ ) || ( 0 == user_id_ || 0 == group_id_ ) ) ) {
+                    fprintf(it.second->fp_, "  - USER : %4" PRIu32 " - %s\n", user_id_, user_name_.c_str());
+                    fprintf(it.second->fp_, "  - GROUP: %4" PRIu32 " - %s\n", group_id_, group_name_.c_str());
+                }
+                fprintf(it.second->fp_, "⌥ PERMISSIONS:\n");
+                fprintf(it.second->fp_, "  - MODE : %-4o\n", mode_);
+                fprintf(it.second->fp_, "--- --- ---\n");
                 fflush(it.second->fp_);
             }
-            EnsureOwnership();
         }
         
         /**
          * @brief Output a log message if the provided token is registered.
          *
          * @param a_token The token to be tested.
-         * @param a_format
-         * @param ...
+         * @param a_format printf like format followed by a variable number of arguments
+         * @param ... __VA_ARGS__
          */
         inline void Trace::Log (const std::string& a_token, const char* a_format, ...)
         {
@@ -464,6 +487,36 @@ namespace osal
         /**
          * @brief Change the logs permissions to a specific user / group.
          *
+         * @param a_user_id  Log file owner ID.
+         * @param a_group_id Log file owner group ID.
+         *
+         * @return True if all files changed to new permissions or it not needed, false otherwise.
+         */
+        inline bool Trace::EnsureOwnership (uid_t a_user_id, gid_t a_group_id)
+        {
+            OSAL_DEBUG_TRACE_LOCK_GUARD();
+            user_id_    = a_user_id;
+            user_name_  = "";
+            group_id_   = a_group_id;
+            group_name_ = "";
+            if ( not ( UINT32_MAX == user_id_ || 0 == user_id_) ) {
+                struct passwd* pw = getpwuid(user_id_);
+                if ( nullptr != pw ) {
+                    user_name_ = pw->pw_name;
+                }
+            }
+            if ( not ( UINT32_MAX == user_id_ || 0 == user_id_) ) {
+                struct group* gr = getgrgid(group_id_);
+                if ( nullptr != gr ) {
+                    group_name_ = gr->gr_name;
+                }
+            }
+            return EnsureOwnership();
+        }
+    
+        /**
+         * @brief Change the logs permissions to a specific user / group.
+         *
          * @return True if all files changed to new permissions or it not needed, false otherwise.
          */
         inline bool Trace::EnsureOwnership ()
@@ -473,9 +526,7 @@ namespace osal
             }
             size_t count = 0;
             for ( auto it : tokens_ ) {
-                const int chown_status = chown(it.second->uri_.c_str(), user_id_, group_id_);
-                const int chmod_status = chmod(it.second->uri_.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
-                if ( 0 == chown_status && 0 == chmod_status ) {
+                if ( true == EnsureOwnership(it.second->uri_.c_str()) ) {
                     count++;
                 }
             }
@@ -483,19 +534,28 @@ namespace osal
         }
         
         /**
-         * @brief Change the logs permissions to a specific user / group.
+         * @brief Change the logs permissions to a specific user / group for a specific file.
          *
-         * @param a_user_id
-         * @param a_group_id
+         * @param a_uri File URI,
          *
-         * @return True if all files changed to new permissions or it not needed, false otherwise.
+         * @return True if changed to new permissions or it not needed, false otherwise.
          */
-        inline bool Trace::EnsureOwnership (uid_t a_user_id, gid_t a_group_id)
+        inline bool Trace::EnsureOwnership (const std::string& a_uri)
         {
-            OSAL_DEBUG_TRACE_LOCK_GUARD();
-            user_id_  = a_user_id;
-            group_id_ = a_group_id;
-            return EnsureOwnership();
+            if ( ( UINT32_MAX == user_id_ || UINT32_MAX == group_id_ ) || ( 0 == user_id_ || 0 == group_id_ ) ) {
+                return true;
+            }
+            const int chown_status = chown(a_uri.c_str(), user_id_, group_id_);
+            if ( 0 != chown_status ) {
+                fprintf(stderr, "WARNING: failed to change ownership of %s to %u:%u ~ %d - %s\n", a_uri.c_str(), user_id_, group_id_, errno, strerror(errno));
+                fflush(stderr);
+            }
+            const int chmod_status = chmod(a_uri.c_str(), mode_);
+            if ( 0 != chmod_status ) {
+                fprintf(stderr, "WARNING: failed to change permissions of %s to %o ~ %d - %s\n", a_uri.c_str(), mode_, errno, strerror(errno));
+                fflush(stderr);
+            }
+            return ( 0 == chown_status && 0 == chmod_status );
         }
             
     } // end of namesapce debug

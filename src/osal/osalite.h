@@ -277,8 +277,12 @@ typedef size_t ssize_t;
     #define UINT16_FMT "%" PRIu16
     #define UINT16_FMT_ZP(d) "%0" #d PRIu16
 
-    #define INT32_FMT  "%" PRId32
-    #define UINT32_FMT "%" PRIu32
+    #define INT32_FMT        "%" PRId32
+    #define INT32_FMT_RP(d)  "%" #d PRId32
+    #define INT32_FMT_LP(d)  "%-" #d PRId32
+    #define UINT32_FMT       "%" PRIu32
+    #define UINT32_FMT_RP(d) "%"  #d PRIu32
+    #define UINT32_FMT_LP(d) "%-" #d PRIu32
 
     #define INT64_FMT        "%" PRId64
     #define INT64_FMT_ZP(d)  "%0" #d PRId64
