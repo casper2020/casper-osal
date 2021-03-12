@@ -307,7 +307,7 @@ namespace osal
                 // ... log recycle messages ...
                 fprintf(it.second->fp_, "--- --- ---\n");
                 fprintf(it.second->fp_, "⌥ LOG FILE   : %s\n", it.second->uri_.c_str());
-                fprintf(it.second->fp_, "⌥ OWNERSHIP  : %4O\n", mode_);
+                fprintf(it.second->fp_, "⌥ OWNERSHIP  : %4o\n", mode_);
                 if ( not ( ( UINT32_MAX == user_id_ || UINT32_MAX == group_id_ ) || ( 0 == user_id_ || 0 == group_id_ ) ) ) {
                     fprintf(it.second->fp_, "  - USER : %4" PRIu32 " - %s\n", user_id_, user_name_.c_str());
                     fprintf(it.second->fp_, "  - GROUP: %4" PRIu32 " - %s\n", group_id_, group_name_.c_str());
