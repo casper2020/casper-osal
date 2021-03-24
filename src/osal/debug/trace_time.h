@@ -335,7 +335,7 @@ namespace osal
             //  "[%02d/%3s/%04d:%02d:%02d:%02d +0000], %p, %5.5f, %5.5f, %s, %s";
             Log(a_key, "[%02d/%3s/%04d:%02d:%02d:%02d +0000], %p, %05lld, %05lld, %3d, %8s, %s, ",
                 (int)h_r_time.day_, osal::Time::GetHumanReadableMonth(h_r_time.month_),  (int)h_r_time.year_,  (int)h_r_time.hours_,  (int)h_r_time.minutes_,  (int)h_r_time.seconds_,
-                         parent_, elapsed_one, elapsed_two, static_cast<int>(token->second->count_), token->second->name_.c_str(), token->second->title_.c_str());
+                         parent_, static_cast<long long int>(elapsed_one), static_cast<long long int>(elapsed_two), static_cast<int>(token->second->count_), token->second->name_.c_str(), token->second->title_.c_str());
 
             token->second->count_  = 0;
 
