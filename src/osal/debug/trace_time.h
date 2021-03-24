@@ -158,18 +158,18 @@ namespace osal
         public: // Log API - Method(s) / Function(s)
 
             void         Start           (const std::string& a_key);
-            void         Start           (const std::string& a_key, const char* const a_format, ...);
+            void         Start           (const std::string& a_key, const char* const a_format, ...) __attribute__((format(printf, 3, 4)));
             void         Stop            (const std::string& a_key, uint8_t a_timer);
             void         Stop            (const std::string& a_key, uint8_t a_timer, TimePoint a_start, TimePoint a_finish);
             void         SetCounter      (const std::string& a_key, size_t a_value);
-            void         Flush           (const std::string& a_key, const char* const a_format, ...);
+            void         Flush           (const std::string& a_key, const char* const a_format, ...) __attribute__((format(printf, 3, 4)));
             std::string  MakeKey         (const char* const a_format, ...);
 
         private: //
 
             void    ResetToken           (const std::string& a_key, const char* const a_title);
             void    EnsureBufferCapacity (const size_t& a_capacity);
-            void    Log                  (const std::string& a_key, const char* const a_format, ...);
+            void    Log                  (const std::string& a_key, const char* const a_format, ...) __attribute__((format(printf, 3, 4)));
             void    Log                  (const std::string& a_key, const char* const a_format, va_list& a_args);
             int     Write                (const char* const a_format, va_list& a_args);
 
@@ -487,12 +487,18 @@ namespace osal
             EnsureBufferCapacity(1024);
 
             int aux = INT_MAX;
+            
+            va_list args;
 
             // ... try at least 2 times to construct the output message ...
             for ( uint8_t attempt = 0 ; attempt < 2 ; ++attempt ) {
 
                 buffer_[0] = '\0';
-                aux        = vsnprintf(buffer_, buffer_capacity_ - 1, a_format, a_args);
+                
+                va_copy(args, a_args);
+                aux = vsnprintf(buffer_, buffer_capacity_ - 1, a_format, args);
+                va_end(args);
+                
                 if ( aux < 0 ) {
                     // ... an error has occurred ...
                     buffer_[0] = '\0';
