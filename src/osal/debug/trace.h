@@ -526,7 +526,7 @@ namespace osal
             }
             size_t count = 0;
             for ( auto it : tokens_ ) {
-                if ( true == EnsureOwnership(it.second->uri_.c_str()) ) {
+                if ( 0 == it.second->uri_.length() || true == EnsureOwnership(it.second->uri_.c_str()) ) {
                     count++;
                 }
             }
