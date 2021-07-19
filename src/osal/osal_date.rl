@@ -138,8 +138,6 @@ double osal::Date::ToExcelDate (const std::string& a_value)
     OSAL_UNUSED_PARAM(excel_date_value_error);
     OSAL_UNUSED_PARAM(excel_date_value_en_main);
 
-#endif
-
     return rv;
 }
 
@@ -398,4 +396,5 @@ void osal::Date::TestISO80601 ()
     assert(9 == HoursFromExcelDate(excel_date));
     assert(47 == MinutesFromExcelDate(excel_date));
     assert(14 == SecondsFromExcelDate(excel_date));
+#endif
 }
