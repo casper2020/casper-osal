@@ -74,6 +74,8 @@ double osal::Date::ToExcelDate (const std::string& a_value)
     human_time.hours_   = 0;
     human_time.weekday_ = std::numeric_limits<uint8_t>::max();
 
+#ifndef __clang_analyzer__
+    
     %%{
         machine excel_date_value;
 
@@ -137,6 +139,8 @@ double osal::Date::ToExcelDate (const std::string& a_value)
 
     OSAL_UNUSED_PARAM(excel_date_value_error);
     OSAL_UNUSED_PARAM(excel_date_value_en_main);
+
+#endif
 
     return rv;
 }
