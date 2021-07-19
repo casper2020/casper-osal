@@ -73,8 +73,6 @@ double osal::Date::ToExcelDate (const std::string& a_value)
     human_time.minutes_ = 0;
     human_time.hours_   = 0;
     human_time.weekday_ = std::numeric_limits<uint8_t>::max();
-
-#ifndef __clang_analyzer__
     
     %%{
         machine excel_date_value;
@@ -400,5 +398,4 @@ void osal::Date::TestISO80601 ()
     assert(9 == HoursFromExcelDate(excel_date));
     assert(47 == MinutesFromExcelDate(excel_date));
     assert(14 == SecondsFromExcelDate(excel_date));
-#endif
 }
