@@ -30,7 +30,13 @@ PROJECT_SRC_DIR     := $(ROOT_DIR)/casper-osal
 EXECUTABLE_NAME     := 
 EXECUTABLE_MAIN_SRC :=
 LIBRARY_TYPE        := static
-LIBRARY_NAME        := libosal.a
+ifeq (true, $(V8_DEP_ON))
+  LIBRARY_NAME := libosal-v8.a
+else ifeq (true, $(ICU_STAND_ALONE_DEP_ON))
+  LIBRARY_NAME := libosal-icu.a
+else
+  LIBRARY_NAME := libosal.a
+endif
 VERSION             := $(shell cat $(PROJECT_SRC_DIR)/VERSION)
 CHILD_CWD           := $(THIS_DIR)
 CHILD_MAKEFILE      := $(firstword $(MAKEFILE_LIST))
@@ -60,7 +66,7 @@ OBJECTS := \
 
 include $(PACKAGER_DIR)/common/c++/common.mk
 
-set-dependencies: icu-dep-on
+set-dependencies:
 
 all: lib
 
