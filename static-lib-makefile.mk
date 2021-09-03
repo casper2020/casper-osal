@@ -66,6 +66,11 @@ OBJECTS := \
 
 include $(PACKAGER_DIR)/common/c++/common.mk
 
+ifeq (true, $(ICU_STAND_ALONE_DEP_ON))
+  CXXFLAGS+=-DCASPER_REQUIRE_STANDALONE_ICU=1
+  CFLAGS+=-DCASPER_REQUIRE_STANDALONE_ICU=1
+endif
+
 set-dependencies:
 
 all: lib
