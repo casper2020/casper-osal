@@ -81,6 +81,7 @@
         divider_               = 1;
         negative_exponent_     = false;
         exponent_              = 0;
+        valid_read_            = false;
     }
 
     action parse_number
@@ -102,6 +103,7 @@
                 }
             }
         }
+        valid_read_ = true;
     }
 
     number = (zlen >reset_number ([+\-] $sign)? [0-9]+ $dgt ( '.' [0-9]+ $frac )?( [eE] ( [+\-] $exp_sign )? [0-9]+ $exp )? %parse_number);
