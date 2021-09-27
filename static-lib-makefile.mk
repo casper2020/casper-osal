@@ -66,12 +66,14 @@ OBJECTS := \
 
 include $(PACKAGER_DIR)/common/c++/common.mk
 
+OSAL_DEPS=
 ifeq (true, $(ICU_STAND_ALONE_DEP_ON))
   CXXFLAGS+=-DCASPER_REQUIRE_STANDALONE_ICU=1
   CFLAGS+=-DCASPER_REQUIRE_STANDALONE_ICU=1
+  OSAL_DEPS=casper-osal-icu-dep-on
 endif
 
-set-dependencies:
+set-dependencies: $(OSAL_DEPS)
 
 all: lib
 
