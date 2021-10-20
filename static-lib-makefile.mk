@@ -58,7 +58,8 @@ RAGEL_SRC := \
   $(OSAL_RAGEL_SRC)
 
 INCLUDE_DIRS := \
-  -I $(PROJECT_SRC_DIR)/src
+  -I $(PROJECT_SRC_DIR)/src \
+  -I $(ICU_INCLUDE_DIRS)
 
 OBJECTS := \
   $(OSAL_CC_SRC:.cc=.o) \
