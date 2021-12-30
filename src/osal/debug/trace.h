@@ -385,10 +385,10 @@ namespace osal
          * @brief Output a log message if the provided token is registered.
          *
          * @param a_token The token to be tested.
-         * @param a_function
-         * @param a_line
-         * @param a_format
-         * @param ...
+         * @param a_function Calling function.
+         * @param a_line     Call file line.
+         * @param a_format   printf like format
+         * @param ...        prontf like arguments
          */
         inline void Trace::LogExtended (const std::string& a_token, const char* a_function, const int& a_line, const char* a_format, ...)
         {

@@ -100,7 +100,7 @@ namespace osal {
             return mode_;
         }
 
-    };
+    }
 
 }
 
