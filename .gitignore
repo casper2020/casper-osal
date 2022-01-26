@@ -2,7 +2,6 @@
 # OSAL PROJECT .gitignore
 ###########################
 
-version.h
 *.o
 out
 src/osal/osal_date.cc
@@ -15,3 +14,6 @@ src/osal/osal_date.cc
 
 # macOS spotlight
 .DS_Store
+
+##############
+src/osal/version.h

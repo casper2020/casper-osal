@@ -22,18 +22,15 @@
 #ifndef CASPER_OSAL_ABOUT_H_
 #define CASPER_OSAL_ABOUT_H_
 
-namespace casper
+namespace osal
 {
-    namespace osal
-    {
-        const char* const ABBR () __attribute__((used));
-        const char* const NAME () __attribute__((used));
-        const char* const VERSION () __attribute__((used));
-        const char* const REL_DATE () __attribute__((used));
-        const char* const REL_BRANCH () __attribute__((used));
-        const char* const REL_HASH () __attribute__((used));
-        const char* const INFO () __attribute__((used));
-    }
+    const char* const ABBR () __attribute__((used));
+    const char* const NAME () __attribute__((used));
+    const char* const VERSION () __attribute__((used));
+    const char* const REL_DATE () __attribute__((used));
+    const char* const REL_BRANCH () __attribute__((used));
+    const char* const REL_HASH () __attribute__((used));
+    const char* const INFO () __attribute__((used));
 }
 
 #endif // CASPER_OSAL_ABOUT_H_

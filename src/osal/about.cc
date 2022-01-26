@@ -19,40 +19,40 @@
  * along with casper-connectors. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "about.h"
-#include "version.h"
+#include "osal/about.h"
+#include "osal/version.h"
 
-const char* const casper::osal::ABBR ()
+const char* const osal::ABBR ()
 {
     return CASPER_OSAL_ABBR;
 }
 
-const char* const casper::osal::NAME ()
+const char* const osal::NAME ()
 {
     return CASPER_OSAL_NAME;
 }
 
-const char* const casper::osal::VERSION ()
+const char* const osal::VERSION ()
 {
     return CASPER_OSAL_VERSION;
 }
 
-const char* const casper::osal::REL_DATE ()
+const char* const osal::REL_DATE ()
 {
     return CASPER_OSAL_REL_DATE;
 }
 
-const char* const casper::osal::REL_BRANCH ()
+const char* const osal::REL_BRANCH ()
 {
     return CASPER_OSAL_REL_BRANCH;
 }
 
-const char* const casper::osal::REL_HASH ()
+const char* const osal::REL_HASH ()
 {
     return CASPER_OSAL_REL_HASH;
 }
 
-const char* const casper::osal::INFO ()
+const char* const osal::INFO ()
 {
     return CASPER_OSAL_INFO;
 }
