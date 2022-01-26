@@ -37,6 +37,11 @@ const char* const osal::VERSION ()
     return CASPER_OSAL_VERSION;
 }
 
+const char* const osal::REL_NAME ()
+{
+    return CASPER_OSAL_REL_NAME;
+}
+
 const char* const osal::REL_DATE ()
 {
     return CASPER_OSAL_REL_DATE;

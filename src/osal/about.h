@@ -27,6 +27,7 @@ namespace osal
     const char* const ABBR () __attribute__((used));
     const char* const NAME () __attribute__((used));
     const char* const VERSION () __attribute__((used));
+    const char* const REL_NAME () __attribute__((used));
     const char* const REL_DATE () __attribute__((used));
     const char* const REL_BRANCH () __attribute__((used));
     const char* const REL_HASH () __attribute__((used));

@@ -27,11 +27,15 @@
 #endif
 
 #ifndef CASPER_OSAL_NAME
-#define CASPER_OSAL_NAME "casper-osal@b.n.s@"
+#define CASPER_OSAL_NAME "casper-osal"
 #endif
 
 #ifndef CASPER_OSAL_VERSION
 #define CASPER_OSAL_VERSION "x.x.x"
+#endif
+
+#ifndef CASPER_OSAL_REL_NAME
+#define CASPER_OSAL_REL_NAME "n.n.n"
 #endif
 
 #ifndef CASPER_OSAL_REL_DATE
