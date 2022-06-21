@@ -261,8 +261,12 @@ typedef size_t ssize_t;
     #define SIZET_FMT_BP(d)   "%" #d "d"
     #define SSIZET_FMT_BP(d)  "%" #d "d"
 #else
-    #define SIZET_FMT "%zd"
-    #define SSIZET_FMT "%d"
+#ifndef SIZET_FMT
+    #define SIZET_FMT "%zu"
+#endif
+#ifndef SSIZET_FMT
+    #define SSIZET_FMT "%zd"
+#endif
     #define SIZET_FMT_BP(d)   "%" #d "zu"
     #define SSIZET_FMT_BP(d)  "%" #d "zd"
 #endif
