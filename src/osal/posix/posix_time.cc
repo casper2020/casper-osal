@@ -242,7 +242,7 @@ std::string osal::posix::Time::ToHumanReadableTimeISO8601WithTZ (const HumanRead
                            static_cast<int>(a_hr_time.hours_), static_cast<int>(a_hr_time.minutes_), static_cast<int>(a_hr_time.seconds_),
                            static_cast<int>(a_hr_time.tz_hours_), static_cast<int>(a_hr_time.tz_minutes_)
     );
-    return w > 0 ? std::string(buff, w) : "";
+    return w > 0 ? std::string(buff, static_cast<size_t>(w)) : "";
 }
 
 /**
@@ -262,7 +262,7 @@ std::string osal::posix::Time::ToHumanReadableTimeISO8601 (const int64_t a_times
                                static_cast<int>(hr_time.year_ ), static_cast<int>(hr_time.month_  ), static_cast<int>(hr_time.day_    ),
                                static_cast<int>(hr_time.hours_), static_cast<int>(hr_time.minutes_), static_cast<int>(hr_time.seconds_)
         );
-        return w > 0 ? std::string(buff, w) : "";
+        return w > 0 ? std::string(buff, static_cast<size_t>(w)) : "";
     } else {
         return "";
     }

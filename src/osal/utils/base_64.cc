@@ -85,7 +85,7 @@ osal::utils::Base64::Status osal::utils::Base64::Encode (const char* a_buffer, s
 		for ( uint8_t i = 0; i < 3; i++) {
 			if ( in_size > 0 ) {
 				input_parts++;
-				i_buf[i] = *in_data;
+				i_buf[i] = static_cast<uint8_t>(*in_data);
 				in_data++;
 				in_size--;
 			} else {
