@@ -87,17 +87,17 @@ bool osal::posix::CircularBuffer::Init (const char* a_data_path, int32_t a_lengt
         perror("ftruncate");
         goto cleanup;
     }
-    buffer_ = mmap(NULL, length_ * 2, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, -1, 0);
+    buffer_ = mmap(NULL, static_cast<size_t>(length_ * 2), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, -1, 0);
     if (buffer_ == MAP_FAILED) {
         perror("map anon");
         goto cleanup;
     }
-    lower_half_ = mmap(buffer_, length_, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED, fd, 0);
+    lower_half_ = mmap(buffer_, static_cast<size_t>(length_), PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED, fd, 0);
     if ( lower_half_ == MAP_FAILED) {
         perror("map lower");
         goto cleanup;
     }
-    upper_half_ = mmap((int8_t*) buffer_ + length_, length_, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED, fd, 0);
+    upper_half_ = mmap((int8_t*) buffer_ + length_, static_cast<size_t>(length_), PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED, fd, 0);
     if ( upper_half_ == MAP_FAILED ) {
         perror("map upper");
         goto cleanup;
@@ -131,13 +131,13 @@ void osal::posix::CircularBuffer::Close ()
 {
     if ( length_ != 0 ) {
         if ( lower_half_ != MAP_FAILED ) {
-            munmap(lower_half_, length_);
+            munmap(lower_half_, static_cast<size_t>(length_));
         }
         if ( upper_half_ != MAP_FAILED ) {
-            munmap(upper_half_, length_);
+            munmap(upper_half_, static_cast<size_t>(length_));
         }
         if ( buffer_ != MAP_FAILED ) {
-            munmap(buffer_, length_ * 2);
+            munmap(buffer_, static_cast<size_t>(length_) * 2);
         }
     }
     Init();
@@ -176,7 +176,7 @@ bool osal::posix::CircularBuffer::ProduceBytes (const void* a_src, int32_t a_len
     if ( space < a_length ) {
         return false;
     } else {
-        memcpy(ptr, a_src, a_length);
+        memcpy(ptr, a_src, static_cast<size_t>(a_length));
         Produce(a_length);
         return true;
     }

@@ -699,7 +699,7 @@ osal::posix::File::Status osal::posix::File::UniqueFileName (const std::string& 
 
     char f_template[osal::Dir::kMaxPath] = { 0, 0 };
     memcpy(f_template, o_name.c_str(), o_name.length());
-    int  fd = mkstemps(f_template, sizeof(char) * static_cast<int>(a_extension.length() + 1));
+    int  fd = mkstemps(f_template, static_cast<int>(sizeof(char)) * static_cast<int>(a_extension.length() + 1));
     if ( -1 == fd ) {
         return osal::posix::File::EStatusOpenError;
     } else {

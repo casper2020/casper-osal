@@ -425,7 +425,7 @@ std::string osal::UTF8StringHelper::URIEncode (const std::string& a_uri)
     // ... pick new url start ...
     if ( query_start_ptr != uri_start_ptr ) {
         // ... from the beginning until the start of the query ...
-        encoded_uri = std::string(uri_start_ptr, (query_start_ptr - uri_start_ptr));
+        encoded_uri = std::string(uri_start_ptr, static_cast<size_t>(query_start_ptr - uri_start_ptr));
     } else {
         // ... uri starts with query separator ...
         encoded_uri = "";
@@ -463,7 +463,7 @@ std::string osal::UTF8StringHelper::URIEncode (const std::string& a_uri)
     }
     // ... append remaining uri ( a.k.a. fragment ) ....
     if ( uri_end_ptr != query_ptr ) {
-        encoded_uri += std::string(query_ptr, (uri_end_ptr - query_ptr));
+        encoded_uri += std::string(query_ptr, static_cast<size_t>(uri_end_ptr - query_ptr));
     }
     // ... we're done ..
     return encoded_uri;

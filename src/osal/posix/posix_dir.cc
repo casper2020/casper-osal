@@ -308,7 +308,7 @@ osal::posix::Dir::Status osal::posix::Dir::FreeSpace (const char *a_name, int64_
     //
     if ( statfs(a_name, &stat_data) == 0 ) {
         //
-        (*o_space) = (uint64_t)((uint64_t)stat_data.f_bfree * (uint64_t)stat_data.f_bsize);
+        (*o_space) = (int64_t)((uint64_t)stat_data.f_bfree * (uint64_t)stat_data.f_bsize);
     } else {
         // failure
         return osal::posix::Dir::EStatusOpenError;
@@ -325,7 +325,7 @@ osal::posix::Dir::Status osal::posix::Dir::TotalSpace (const char *a_name, int64
     //
     if ( statfs(a_name, &stat_data) == 0 ) {
         //
-        (*o_space) = (uint64_t)((uint64_t)stat_data.f_blocks * (uint64_t)stat_data.f_bsize);
+        (*o_space) = (int64_t)((uint64_t)stat_data.f_blocks * (uint64_t)stat_data.f_bsize);
     } else {
         // failure
         return osal::posix::Dir::EStatusOpenError;

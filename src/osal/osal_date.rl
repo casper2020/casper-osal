@@ -79,42 +79,42 @@ double osal::Date::ToExcelDate (const std::string& a_value)
 
         action set_year
         {
-            human_time.year_ = (fpc[-3] - '0') * 1000 + (fpc[-2] - '0') * 100 + (fpc[-1] - '0') * 10 + (fpc[0] - '0');
+            human_time.year_ = static_cast<uint16_t>(fpc[-3] - '0') * 1000 + (fpc[-2] - '0') * 100 + (fpc[-1] - '0') * 10 + (fpc[0] - '0');
         }
 
         action set_month
         {
-            human_time.month_ = (fpc[-1] - '0') * 10 + (fpc[0] - '0');
+            human_time.month_ = static_cast<uint8_t>(fpc[-1] - '0') * 10 + (fpc[0] - '0');
         }
 
         action set_day
         {
-            human_time.day_ = (fpc[-1] - '0') * 10 + (fpc[0] - '0');
+            human_time.day_ = static_cast<uint8_t>(fpc[-1] - '0') * 10 + (fpc[0] - '0');
         }
 
         action set_hours
         {
-            human_time.hours_ = (fpc[-1] - '0') * 10 + (fpc[0] - '0');
+            human_time.hours_ = static_cast<uint8_t>(fpc[-1] - '0') * 10 + (fpc[0] - '0');
         }
 
         action set_minutes
         {
-            human_time.minutes_ = (fpc[-1] - '0') * 10 + (fpc[0] - '0');
+            human_time.minutes_ = static_cast<uint8_t>(fpc[-1] - '0') * 10 + (fpc[0] - '0');
         }
 
         action set_seconds
         {
-            human_time.seconds_ = (fpc[-1] - '0') * 10 + (fpc[0] - '0');
+            human_time.seconds_ = static_cast<uint8_t>(fpc[-1] - '0') * 10 + (fpc[0] - '0');
         }
 
         action set_tz_hours
         {
-            human_time.tz_hours_   = (fpc[-1] - '0') * 10 + (fpc[0] - '0');
+            human_time.tz_hours_ = static_cast<uint8_t>(fpc[-1] - '0') * 10 + (fpc[0] - '0');
         }
 
         action set_tz_minutes
         {
-            human_time.tz_minutes_ = (fpc[-1] - '0') * 10 + (fpc[0] - '0');
+            human_time.tz_minutes_ = static_cast<uint8_t>(fpc[-1] - '0') * 10 + (fpc[0] - '0');
         }
 
         sep  = '-' | '/';
@@ -295,7 +295,7 @@ std::string osal::Date::ExcelDateToISO8601 (const double& a_date)
                                                        osal::Date::k_default_iso8601_date_format_,
                                                        static_cast<int>(human_time.year_), static_cast<int>(human_time.month_), static_cast<int>(human_time.day_)
         );
-        std::vector<char> buffer(required_buffer_size + 1);
+        std::vector<char> buffer(static_cast<size_t>(required_buffer_size) + 1);
         const int bytes_written = std::snprintf(&buffer[0], buffer.size(),
                                                 osal::Date::k_default_iso8601_date_format_,
                                                 static_cast<int>(human_time.year_), static_cast<int>(human_time.month_), static_cast<int>(human_time.day_)
@@ -326,7 +326,7 @@ std::string osal::Date::ExcelDateToISO8601CombinedInUTC (const double& a_date)
                                                        static_cast<int>(human_time.year_ ), static_cast<int>(human_time.month_  ), static_cast<int>(human_time.day_    ),
                                                        static_cast<int>(human_time.hours_), static_cast<int>(human_time.minutes_), static_cast<int>(human_time.seconds_)
         );
-        std::vector<char> buffer(required_buffer_size + 1);
+        std::vector<char> buffer(static_cast<size_t>(required_buffer_size) + 1);
         const int bytes_written = std::snprintf(&buffer[0], buffer.size(),
                                                 osal::Date::k_default_iso8601_combined_in_utc_format_,
                                                 static_cast<int>(human_time.year_ ), static_cast<int>(human_time.month_  ), static_cast<int>(human_time.day_    ),
@@ -355,7 +355,7 @@ std::string osal::Date::EpochToISO8601CombinedInUTC (const time_t& a_epoch)
                                                        static_cast<int>(human_time.year_ ), static_cast<int>(human_time.month_  ), static_cast<int>(human_time.day_    ),
                                                        static_cast<int>(human_time.hours_), static_cast<int>(human_time.minutes_), static_cast<int>(human_time.seconds_)
         );
-        std::vector<char> buffer(required_buffer_size + 1);
+        std::vector<char> buffer(static_cast<size_t>(required_buffer_size) + 1);
         const int bytes_written = std::snprintf(&buffer[0], buffer.size(),
                                                 osal::Date::k_default_iso8601_combined_in_utc_format_,
                                                 static_cast<int>(human_time.year_ ), static_cast<int>(human_time.month_  ), static_cast<int>(human_time.day_    ),

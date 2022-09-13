@@ -146,11 +146,11 @@ inline void osal::posix::CircularBufferNoMmap::Read (void* a_dst, int32_t a_amou
         return;
     }
     if ( a_amount <=  contiguous_readable_bytes_ ) {
-        memcpy(a_dst, (uint8_t*) buffer_ + tail_, a_amount);
+        memcpy(a_dst, (uint8_t*) buffer_ + tail_, static_cast<size_t>(a_amount));
         tail_ += a_amount;
     } else {
-        memcpy(a_dst, (uint8_t*) buffer_ + tail_, contiguous_readable_bytes_);
-        memcpy((uint8_t*) a_dst + contiguous_readable_bytes_, buffer_, a_amount - contiguous_readable_bytes_);
+        memcpy(a_dst, (uint8_t*) buffer_ + tail_, static_cast<size_t>(contiguous_readable_bytes_));
+        memcpy((uint8_t*) a_dst + contiguous_readable_bytes_, buffer_, static_cast<size_t>(a_amount - contiguous_readable_bytes_));
         tail_     = a_amount - contiguous_readable_bytes_;
         seekable_ = false;
     }
@@ -197,11 +197,11 @@ inline void osal::posix::CircularBufferNoMmap::Write (void* a_src, int32_t a_amo
         return;
     }
     if ( a_amount <=  contiguous_writable_bytes_ ) {
-        memcpy((uint8_t*) buffer_ + head_, a_src, a_amount);
+        memcpy((uint8_t*) buffer_ + head_, a_src, static_cast<size_t>(a_amount));
         head_ += a_amount;
     } else {
-        memcpy((uint8_t*) buffer_ + head_, a_src, contiguous_writable_bytes_);
-        memcpy(buffer_, (uint8_t*) a_src + contiguous_writable_bytes_, a_amount - contiguous_writable_bytes_);
+        memcpy((uint8_t*) buffer_ + head_, a_src, static_cast<size_t>(contiguous_writable_bytes_));
+        memcpy(buffer_, (uint8_t*) a_src + contiguous_writable_bytes_, static_cast<size_t>(a_amount - contiguous_writable_bytes_));
         head_     = a_amount - contiguous_writable_bytes_;
         seekable_ = false;
     }

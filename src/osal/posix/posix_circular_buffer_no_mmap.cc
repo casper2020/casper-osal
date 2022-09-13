@@ -57,7 +57,7 @@ void osal::posix::CircularBufferNoMmap::Trace (const char* a_tag, int32_t a_amou
  */
 bool osal::posix::CircularBufferNoMmap::Init (const char*, int32_t a_length)
 {
-    buffer_ = malloc(a_length);
+    buffer_ = malloc(static_cast<size_t>(a_length));
     if ( buffer_ != NULL ) {
         length_ = a_length;
         return  true;
