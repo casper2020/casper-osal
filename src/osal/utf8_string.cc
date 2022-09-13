@@ -308,7 +308,7 @@ std::string osal::UTF8StringHelper::Collate (const char* const a_string)
     
     std::stringstream ss;
     
-    char bytes[4];
+    uint8_t bytes[4];
     
     do {
         uint16_t utf_16_char = iterator.Next();
@@ -386,8 +386,8 @@ void osal::UTF8StringHelper::URIEncode (const std::string& a_string, std::string
         } else {
             // escape this char
             *buffer_end_ptr++ = '%';
-            *buffer_end_ptr++ = kDec2Hex[*current_ptr >> 4];
-            *buffer_end_ptr++ = kDec2Hex[*current_ptr & 0x0F];
+            *buffer_end_ptr++ = static_cast<unsigned char>(kDec2Hex[*current_ptr >> 4]);
+            *buffer_end_ptr++ = static_cast<unsigned char>(kDec2Hex[*current_ptr & 0x0F]);
         }
     }
 

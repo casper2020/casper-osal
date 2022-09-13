@@ -137,10 +137,10 @@ char* osal::utils::JsonParserBase::CloneString (char* a_string, int a_length) co
 {
     char* rv;
 
-    rv = (char*) malloc(a_length + 1);
+    rv = (char*) malloc(static_cast<size_t>(a_length + 1));
     if ( rv != NULL ) {
         if ( string_has_escapes_ == false ) {
-            strncpy(rv, a_string, a_length);
+            strncpy(rv, a_string, static_cast<size_t>(a_length));
             rv[a_length] = 0;
         } else {
             char* dst = rv;
@@ -173,10 +173,10 @@ char* osal::utils::JsonParserBase::CloneString (char* a_string, int a_length) co
                         uint32_t codepoint;
 
                         ++src;                                    // skip the u
-                        codepoint  = (kHexTable[(int)*(src++)] << 12); // Assume valid hex assured by parser
-                        codepoint |= (kHexTable[(int)*(src++)] <<  8);
-                        codepoint |= (kHexTable[(int)*(src++)] <<  4);
-                        codepoint |=  kHexTable[(int)*(src)];
+                        codepoint  = static_cast<uint32_t>(kHexTable[(int)*(src++)] << 12); // Assume valid hex assured by parser
+                        codepoint |= static_cast<uint32_t>(kHexTable[(int)*(src++)] <<  8);
+                        codepoint |= static_cast<uint32_t>(kHexTable[(int)*(src++)] <<  4);
+                        codepoint |= static_cast<uint32_t>(kHexTable[(int)*(src)]);
 
                         if (codepoint <= 0x7F) {
                             *(dst++) = (char) codepoint;
