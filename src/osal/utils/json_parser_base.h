@@ -32,12 +32,12 @@
 
 #include <stdlib.h> // realloc
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
 
 #include "unicode/normalizer2.h" // U_ICU_NAMESPACE::Normalizer2
 
-#pragma GCC diagnostic pop
+#pragma clang diagnostic pop
 
 namespace osal {
 

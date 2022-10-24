@@ -19,8 +19,8 @@
  * along with osal.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunreachable-code"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code"
 
 %%{
     machine json_parser_base;
@@ -378,4 +378,4 @@
 
 }%%
                                  
-#pragma GCC diagnostic pop
+#pragma clang diagnostic pop
