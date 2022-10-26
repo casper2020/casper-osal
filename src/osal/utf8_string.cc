@@ -503,7 +503,7 @@ void osal::UTF8StringHelper::URIDecode (const std::string & a_string, std::strin
     for ( ; source_ptr < last_decoded_symbol_ptr ; ) {
         if ( '%' == *source_ptr ) {
             char dec1, dec2;
-            if ( -1 != ( dec1 = hex2dec(*(source_ptr + 1)) ) && -1 != ( dec2 = hex2dec(*(source_ptr + 2)) ) ) {
+            if ( -1 != ( dec1 = hex2dec(char(*(source_ptr + 1))) ) && -1 != ( dec2 = hex2dec(char(*(source_ptr + 2))) ) ) {
                 // unescape this char
                 *buffer_end_ptr++ = (unsigned char) ( dec1 << 4 ) + dec2;
                 source_ptr += 3;
