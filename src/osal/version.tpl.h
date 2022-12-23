@@ -50,6 +50,10 @@
 #define CASPER_OSAL_REL_HASH "r.r.h"
 #endif
 
+#ifndef CASPER_OSAL_REL_TARGET
+#define CASPER_OSAL_REL_TARGET "r.r.t"
+#endif
+
 #ifndef CASPER_OSAL_INFO
 #define CASPER_OSAL_INFO CASPER_OSAL_NAME " v" CASPER_OSAL_VERSION
 #endif
